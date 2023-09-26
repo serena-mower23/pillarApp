@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "744804378289",
+    "project_id": "pillar2-8ee9e",
+    "storage_bucket": "pillar2-8ee9e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744804378289:android:cda2822a9d02c1aad92490",
+        "android_client_info": {
+          "package_name": "com.serenamower.pillarapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHyEXl2ro63of7zDkbVYoYD-b0ZjkVBKM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

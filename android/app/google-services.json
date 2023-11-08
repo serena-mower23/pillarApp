@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "755117112276",
+    "project_id": "pillartest-951cb",
+    "storage_bucket": "pillartest-951cb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755117112276:android:2a3904332bf46976827441",
+        "android_client_info": {
+          "package_name": "com.serenamower.pillarapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGdbFkjB8HnmH5JMyxkxqC-FDzRqSYgAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

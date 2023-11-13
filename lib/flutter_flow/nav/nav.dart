@@ -119,8 +119,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             pillDosageCount:
                 params.getParam('pillDosageCount', ParamType.String),
             withFood: params.getParam('withFood', ParamType.bool),
-            medicationTimes: params.getParam<DateTime>(
-                'medicationTimes', ParamType.DateTime, true),
+            medicationTime:
+                params.getParam('medicationTime', ParamType.DateTime),
+            pillWeight: params.getParam('pillWeight', ParamType.String),
           ),
         ),
         FFRoute(
@@ -149,8 +150,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             medicationName: params.getParam('medicationName', ParamType.String),
             medicationDosageAmount:
                 params.getParam('medicationDosageAmount', ParamType.String),
-            medicationTimes: params.getParam<DateTime>(
-                'medicationTimes', ParamType.DateTime, true),
+            medicationTime:
+                params.getParam('medicationTime', ParamType.DateTime),
           ),
         ),
         FFRoute(
@@ -342,7 +343,7 @@ class FFRoute {
                     height: 50.0,
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        FlutterFlowTheme.of(context).primary,
+                        Color(0xFF549DA8),
                       ),
                     ),
                   ),

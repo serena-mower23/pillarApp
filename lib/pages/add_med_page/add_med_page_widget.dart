@@ -1,15 +1,14 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
-import '/components/medication_time_picker_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:async';
 import '/custom_code/actions/index.dart' as actions;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -396,10 +395,102 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                           controlAffinity: ListTileControlAffinity.trailing,
                         ),
                       ),
-                      wrapWithModel(
-                        model: _model.medicationTimePickerModel,
-                        updateCallback: () => setState(() {}),
-                        child: MedicationTimePickerWidget(),
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                        child: Text(
+                          'Choose Medication Times',
+                          style: FlutterFlowTheme.of(context).titleLarge,
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: Align(
+                              alignment: AlignmentDirectional(0.00, 0.00),
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 8.0, 0.0, 0.0),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    final _datePickedTime =
+                                        await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.fromDateTime(
+                                          getCurrentTimestamp),
+                                      builder: (context, child) {
+                                        return wrapInMaterialTimePickerTheme(
+                                          context,
+                                          child!,
+                                          headerBackgroundColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primary,
+                                          headerForegroundColor:
+                                              FlutterFlowTheme.of(context).info,
+                                          headerTextStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .headlineLarge
+                                                  .override(
+                                                    fontFamily: 'Outfit',
+                                                    fontSize: 32.0,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                          pickerBackgroundColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .secondaryBackground,
+                                          pickerForegroundColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primaryText,
+                                          selectedDateTimeBackgroundColor:
+                                              Color(0xFFF5ABCF),
+                                          selectedDateTimeForegroundColor:
+                                              FlutterFlowTheme.of(context).info,
+                                          actionButtonForegroundColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primaryText,
+                                          iconSize: 24.0,
+                                        );
+                                      },
+                                    );
+                                    if (_datePickedTime != null) {
+                                      safeSetState(() {
+                                        _model.datePicked = DateTime(
+                                          getCurrentTimestamp.year,
+                                          getCurrentTimestamp.month,
+                                          getCurrentTimestamp.day,
+                                          _datePickedTime.hour,
+                                          _datePickedTime.minute,
+                                        );
+                                      });
+                                    }
+                                  },
+                                  text: 'Choose Time',
+                                  options: FFButtonOptions(
+                                    height: 40.0,
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        24.0, 0.0, 24.0, 0.0),
+                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    color: Color(0xFFF5ABCF),
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
+                                        ),
+                                    elevation: 3.0,
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.max,
@@ -424,12 +515,8 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                                       _model.isFetchingDevices = true;
                                       _model.isFetchingConnectedDevices = true;
                                     });
-                                    unawaited(
-                                      () async {
-                                        _model.fetchedConnectedDevices =
-                                            await actions.getConnectedDevices();
-                                      }(),
-                                    );
+                                    _model.fetchedConnectedDevices =
+                                        await actions.getConnectedDevices();
                                     setState(() {
                                       _model.isFetchingConnectedDevices = false;
                                       _model.connectedDevices = _model
@@ -437,12 +524,8 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                                           .toList()
                                           .cast<BTDeviceStruct>();
                                     });
-                                    unawaited(
-                                      () async {
-                                        _model.devicesFound =
-                                            await actions.findDevices();
-                                      }(),
-                                    );
+                                    _model.devicesFound =
+                                        await actions.findDevices();
                                     setState(() {
                                       _model.isFetchingDevices = false;
                                       _model.foundDevices = _model.devicesFound!
@@ -584,7 +667,7 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                               height: 50.0,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  FlutterFlowTheme.of(context).primary,
+                                  Color(0xFF549DA8),
                                 ),
                               ),
                             ),
@@ -595,32 +678,7 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                         return FFButtonWidget(
                           onPressed: () async {
                             setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked1!);
-                            });
-                            setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked2!);
-                            });
-                            setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked3!);
-                            });
-                            setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked4!);
-                            });
-                            setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked5!);
-                            });
-                            setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked6!);
-                            });
-                            setState(() {
-                              _model.addToMedicationTimes(_model
-                                  .medicationTimePickerModel.datePicked7!);
+                              _model.medicationTime = _model.datePicked;
                             });
 
                             await currentUserReference!.update({
@@ -639,10 +697,7 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                                             .pillDosageFieldController.text,
                                         withFood: _model.withFoodTileValue,
                                         pedestalID: _model.selectedDevice?.id,
-                                        fieldValues: {
-                                          'when_to_take':
-                                              _model.medicationTimes,
-                                        },
+                                        whenToTake: _model.medicationTime,
                                         clearUnsetFields: false,
                                       ),
                                       true,
@@ -661,7 +716,7 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                             );
                             await actions.sendMedicationTimes(
                               _model.selectedDevice!,
-                              _model.medicationTimes.toList(),
+                              _model.medicationTime,
                             );
 
                             context.pushNamed(

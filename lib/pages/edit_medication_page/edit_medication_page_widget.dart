@@ -387,7 +387,7 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
                               height: 50.0,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  FlutterFlowTheme.of(context).primary,
+                                  Color(0xFF549DA8),
                                 ),
                               ),
                             ),
@@ -412,11 +412,7 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
                                         pillDosageCount: _model
                                             .pillDosageFieldController.text,
                                         withFood: _model.withFoodTileValue,
-                                        fieldValues: {
-                                          'when_to_take': _model
-                                              .medicationTimePickerModel
-                                              .medicationTimes,
-                                        },
+                                        pedestalID: '',
                                         clearUnsetFields: false,
                                       ),
                                       true,

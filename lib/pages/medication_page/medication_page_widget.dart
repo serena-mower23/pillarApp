@@ -17,7 +17,8 @@ class MedicationPageWidget extends StatefulWidget {
     required this.pillCount,
     required this.pillDosageCount,
     bool? withFood,
-    required this.medicationTimes,
+    required this.medicationTime,
+    this.pillWeight,
   })  : this.withFood = withFood ?? false,
         super(key: key);
 
@@ -27,7 +28,8 @@ class MedicationPageWidget extends StatefulWidget {
   final String? pillCount;
   final String? pillDosageCount;
   final bool withFood;
-  final List<DateTime>? medicationTimes;
+  final DateTime? medicationTime;
+  final String? pillWeight;
 
   @override
   _MedicationPageWidgetState createState() => _MedicationPageWidgetState();
@@ -313,6 +315,45 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Pill Weight:',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 18.0,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  16.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                valueOrDefault<String>(
+                                  widget.pillWeight,
+                                  'No Weight Recorded Yet',
+                                ),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
                         Align(
                           alignment: AlignmentDirectional(0.00, -1.00),
                           child: Padding(
@@ -375,11 +416,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat('jm',
-                                              widget.medicationTimes?.first),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -440,11 +478,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat(
-                                              'jm', widget.medicationTimes?[1]),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -505,11 +540,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat(
-                                              'jm', widget.medicationTimes?[2]),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -570,11 +602,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat(
-                                              'jm', widget.medicationTimes?[3]),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -635,11 +664,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat(
-                                              'jm', widget.medicationTimes?[4]),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -700,11 +726,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat(
-                                              'jm', widget.medicationTimes?[5]),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -765,11 +788,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           16.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        valueOrDefault<String>(
-                                          dateTimeFormat('jm',
-                                              widget.medicationTimes?.last),
-                                          'No Time',
-                                        ),
+                                        dateTimeFormat(
+                                            'jm', widget.medicationTime),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -810,15 +830,14 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       widget.dosageAmount,
                                       ParamType.String,
                                     ),
-                                    'medicationTimes': serializeParam(
-                                      widget.medicationTimes,
+                                    'medicationTime': serializeParam(
+                                      widget.medicationTime,
                                       ParamType.DateTime,
-                                      true,
                                     ),
                                   }.withoutNulls,
                                 );
                               },
-                              text: 'Connect Pedestal',
+                              text: 'Finish Set Up',
                               options: FFButtonOptions(
                                 height: 44.0,
                                 padding: EdgeInsetsDirectional.fromSTEB(

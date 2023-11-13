@@ -4,7 +4,6 @@ import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:async';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/permissions_util.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,12 +19,12 @@ class ConnectPageWidget extends StatefulWidget {
     Key? key,
     required this.medicationName,
     required this.medicationDosageAmount,
-    required this.medicationTimes,
+    required this.medicationTime,
   }) : super(key: key);
 
   final String? medicationName;
   final String? medicationDosageAmount;
-  final List<DateTime>? medicationTimes;
+  final DateTime? medicationTime;
 
   @override
   _ConnectPageWidgetState createState() => _ConnectPageWidgetState();
@@ -83,23 +82,15 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
                 _model.isFetchingDevices = true;
                 _model.isFetchingConnectedDevices = true;
               });
-              unawaited(
-                () async {
-                  _model.fetchedConnectedDevices =
-                      await actions.getConnectedDevices();
-                }(),
-              );
+              _model.fetchedConnectedDevices =
+                  await actions.getConnectedDevices();
               setState(() {
                 _model.isFetchingConnectedDevices = false;
                 _model.connectedDevices = _model.fetchedConnectedDevices!
                     .toList()
                     .cast<BTDeviceStruct>();
               });
-              unawaited(
-                () async {
-                  _model.devicesFound = await actions.findDevices();
-                }(),
-              );
+              _model.devicesFound = await actions.findDevices();
               setState(() {
                 _model.isFetchingDevices = false;
                 _model.foundDevices =
@@ -158,8 +149,9 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
                           EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                       child: Builder(
                         builder: (context) {
-                          final displayAvailableDevices =
-                              _model.devicesFound!.toList();
+                          final displayAvailableDevices = _model.devicesFound!
+                              .where((e) => e.name == 'Arduino')
+                              .toList();
                           return ListView.builder(
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
@@ -211,7 +203,7 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
                                   );
                                   await actions.sendMedicationTimes(
                                     displayAvailableDevicesItem,
-                                    widget.medicationTimes?.toList(),
+                                    widget.medicationTime,
                                   );
 
                                   context.pushNamed(

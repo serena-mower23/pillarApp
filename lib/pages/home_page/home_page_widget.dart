@@ -238,9 +238,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                                           valueColor:
                                                               AlwaysStoppedAnimation<
                                                                   Color>(
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
+                                                            Color(0xFF549DA8),
                                                           ),
                                                         ),
                                                       ),
@@ -327,12 +325,18 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                                             .withFood,
                                                         ParamType.bool,
                                                       ),
-                                                      'medicationTimes':
+                                                      'medicationTime':
                                                           serializeParam(
                                                         medicationsItem
                                                             .whenToTake,
                                                         ParamType.DateTime,
-                                                        true,
+                                                      ),
+                                                      'pillWeight':
+                                                          serializeParam(
+                                                        medicationsItem
+                                                            .pillWeight
+                                                            .toString(),
+                                                        ParamType.String,
                                                       ),
                                                     }.withoutNulls,
                                                   );

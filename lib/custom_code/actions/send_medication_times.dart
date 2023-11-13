@@ -14,10 +14,9 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 Future sendMedicationTimes(
   BTDeviceStruct deviceInfo,
-  List<DateTime>? data,
+  DateTime? data,
 ) async {
-  String dataString =
-      "Monday: ${data?[0]}, Tuesday: ${data?[1]}, Wednesday: ${data?[2]}, Thursday: ${data?[3]}, Friday: ${data?[4]}, Saturday: ${data?[5]}, Sunday: ${data?[6]}";
+  String dataString = data.toString();
   final device = BluetoothDevice.fromId(deviceInfo.id);
   final services = await device.discoverServices();
   for (BluetoothService service in services) {

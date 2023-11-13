@@ -35,8 +35,8 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
       _model.bluetoothEnabled = await actions.isBluetoothEnabled();
     });
 
-    _model.emailFieldController ??= TextEditingController();
-    _model.emailFieldFocusNode ??= FocusNode();
+    _model.usernameFieldController ??= TextEditingController();
+    _model.usernameFieldFocusNode ??= FocusNode();
 
     _model.passwordFieldController ??= TextEditingController();
     _model.passwordFieldFocusNode ??= FocusNode();
@@ -107,27 +107,24 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Welcome Back',
-                              style: FlutterFlowTheme.of(context).displaySmall,
-                            ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 12.0, 0.0, 24.0),
+                                  0.0, 0.0, 0.0, 8.0),
                               child: Text(
-                                'Let\'s get started by filling out the form below.',
-                                style: FlutterFlowTheme.of(context).labelMedium,
+                                'Welcome Back',
+                                style:
+                                    FlutterFlowTheme.of(context).displaySmall,
                               ),
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 16.0),
                               child: TextFormField(
-                                controller: _model.emailFieldController,
-                                focusNode: _model.emailFieldFocusNode,
+                                controller: _model.usernameFieldController,
+                                focusNode: _model.usernameFieldFocusNode,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Email',
+                                  labelText: 'Username',
                                   hintStyle:
                                       FlutterFlowTheme.of(context).bodyLarge,
                                   enabledBorder: OutlineInputBorder(
@@ -161,7 +158,8 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                   ),
                                 ),
                                 style: FlutterFlowTheme.of(context).bodyLarge,
-                                validator: _model.emailFieldControllerValidator
+                                validator: _model
+                                    .usernameFieldControllerValidator
                                     .asValidator(context),
                               ),
                             ),
@@ -237,7 +235,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                   final user =
                                       await authManager.signInWithEmail(
                                     context,
-                                    _model.emailFieldController.text,
+                                    _model.usernameFieldController.text,
                                     _model.passwordFieldController.text,
                                   );
                                   if (user == null) {

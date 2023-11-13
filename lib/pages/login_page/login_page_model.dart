@@ -17,10 +17,10 @@ class LoginPageModel extends FlutterFlowModel<LoginPageWidget> {
   final unfocusNode = FocusNode();
   // Stores action output result for [Custom Action - isBluetoothEnabled] action in LoginPage widget.
   bool? bluetoothEnabled;
-  // State field(s) for EmailField widget.
-  FocusNode? emailFieldFocusNode;
-  TextEditingController? emailFieldController;
-  String? Function(BuildContext, String?)? emailFieldControllerValidator;
+  // State field(s) for UsernameField widget.
+  FocusNode? usernameFieldFocusNode;
+  TextEditingController? usernameFieldController;
+  String? Function(BuildContext, String?)? usernameFieldControllerValidator;
   // State field(s) for PasswordField widget.
   FocusNode? passwordFieldFocusNode;
   TextEditingController? passwordFieldController;
@@ -35,8 +35,8 @@ class LoginPageModel extends FlutterFlowModel<LoginPageWidget> {
 
   void dispose() {
     unfocusNode.dispose();
-    emailFieldFocusNode?.dispose();
-    emailFieldController?.dispose();
+    usernameFieldFocusNode?.dispose();
+    usernameFieldController?.dispose();
 
     passwordFieldFocusNode?.dispose();
     passwordFieldController?.dispose();

@@ -1,4 +1,5 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -26,8 +27,8 @@ class _NewAccountPageWidgetState extends State<NewAccountPageWidget> {
     super.initState();
     _model = createModel(context, () => NewAccountPageModel());
 
-    _model.displayNameFieldController ??= TextEditingController();
-    _model.displayNameFieldFocusNode ??= FocusNode();
+    _model.usernameFieldController ??= TextEditingController();
+    _model.usernameFieldFocusNode ??= FocusNode();
 
     _model.emailFieldController ??= TextEditingController();
     _model.emailFieldFocusNode ??= FocusNode();
@@ -120,8 +121,8 @@ class _NewAccountPageWidgetState extends State<NewAccountPageWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 16.0),
                               child: TextFormField(
-                                controller: _model.displayNameFieldController,
-                                focusNode: _model.displayNameFieldFocusNode,
+                                controller: _model.usernameFieldController,
+                                focusNode: _model.usernameFieldFocusNode,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Display Name',
@@ -159,7 +160,7 @@ class _NewAccountPageWidgetState extends State<NewAccountPageWidget> {
                                 ),
                                 style: FlutterFlowTheme.of(context).bodyLarge,
                                 validator: _model
-                                    .displayNameFieldControllerValidator
+                                    .usernameFieldControllerValidator
                                     .asValidator(context),
                               ),
                             ),
@@ -359,12 +360,30 @@ class _NewAccountPageWidgetState extends State<NewAccountPageWidget> {
                                   final user =
                                       await authManager.createAccountWithEmail(
                                     context,
-                                    _model.emailFieldController.text,
+                                    _model.usernameFieldController.text,
                                     _model.passwordFieldController.text,
                                   );
                                   if (user == null) {
                                     return;
                                   }
+
+                                  await UsersRecord.collection
+                                      .doc(user.uid)
+                                      .update({
+                                    ...createUsersRecordData(
+                                      email: _model.emailFieldController.text,
+                                      password:
+                                          _model.passwordFieldController.text,
+                                      username:
+                                          _model.usernameFieldController.text,
+                                    ),
+                                    ...mapToFirestore(
+                                      {
+                                        'created_time':
+                                            FieldValue.serverTimestamp(),
+                                      },
+                                    ),
+                                  });
 
                                   context.pushNamedAuth(
                                       'LoginPage', context.mounted);

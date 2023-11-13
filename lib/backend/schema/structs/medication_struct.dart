@@ -16,8 +16,8 @@ class MedicationStruct extends FFFirebaseStruct {
     String? pillDosageCount,
     bool? withFood,
     String? pedestalID,
-    List<DateTime>? whenToTake,
     double? pillWeight,
+    DateTime? whenToTake,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _medicationName = medicationName,
         _dosageAmount = dosageAmount,
@@ -25,8 +25,8 @@ class MedicationStruct extends FFFirebaseStruct {
         _pillDosageCount = pillDosageCount,
         _withFood = withFood,
         _pedestalID = pedestalID,
-        _whenToTake = whenToTake,
         _pillWeight = pillWeight,
+        _whenToTake = whenToTake,
         super(firestoreUtilData);
 
   // "medication_name" field.
@@ -65,20 +65,18 @@ class MedicationStruct extends FFFirebaseStruct {
   set pedestalID(String? val) => _pedestalID = val;
   bool hasPedestalID() => _pedestalID != null;
 
-  // "when_to_take" field.
-  List<DateTime>? _whenToTake;
-  List<DateTime> get whenToTake => _whenToTake ?? const [];
-  set whenToTake(List<DateTime>? val) => _whenToTake = val;
-  void updateWhenToTake(Function(List<DateTime>) updateFn) =>
-      updateFn(_whenToTake ??= []);
-  bool hasWhenToTake() => _whenToTake != null;
-
   // "pill_weight" field.
   double? _pillWeight;
   double get pillWeight => _pillWeight ?? 0.0;
   set pillWeight(double? val) => _pillWeight = val;
   void incrementPillWeight(double amount) => _pillWeight = pillWeight + amount;
   bool hasPillWeight() => _pillWeight != null;
+
+  // "when_to_take" field.
+  DateTime? _whenToTake;
+  DateTime? get whenToTake => _whenToTake;
+  set whenToTake(DateTime? val) => _whenToTake = val;
+  bool hasWhenToTake() => _whenToTake != null;
 
   static MedicationStruct fromMap(Map<String, dynamic> data) =>
       MedicationStruct(
@@ -88,8 +86,8 @@ class MedicationStruct extends FFFirebaseStruct {
         pillDosageCount: data['pill_dosage_count'] as String?,
         withFood: data['with_food'] as bool?,
         pedestalID: data['pedestalID'] as String?,
-        whenToTake: getDataList(data['when_to_take']),
         pillWeight: castToType<double>(data['pill_weight']),
+        whenToTake: data['when_to_take'] as DateTime?,
       );
 
   static MedicationStruct? maybeFromMap(dynamic data) =>
@@ -102,8 +100,8 @@ class MedicationStruct extends FFFirebaseStruct {
         'pill_dosage_count': _pillDosageCount,
         'with_food': _withFood,
         'pedestalID': _pedestalID,
-        'when_to_take': _whenToTake,
         'pill_weight': _pillWeight,
+        'when_to_take': _whenToTake,
       }.withoutNulls;
 
   @override
@@ -132,14 +130,13 @@ class MedicationStruct extends FFFirebaseStruct {
           _pedestalID,
           ParamType.String,
         ),
-        'when_to_take': serializeParam(
-          _whenToTake,
-          ParamType.DateTime,
-          true,
-        ),
         'pill_weight': serializeParam(
           _pillWeight,
           ParamType.double,
+        ),
+        'when_to_take': serializeParam(
+          _whenToTake,
+          ParamType.DateTime,
         ),
       }.withoutNulls;
 
@@ -175,14 +172,14 @@ class MedicationStruct extends FFFirebaseStruct {
           ParamType.String,
           false,
         ),
-        whenToTake: deserializeParam<DateTime>(
-          data['when_to_take'],
-          ParamType.DateTime,
-          true,
-        ),
         pillWeight: deserializeParam(
           data['pill_weight'],
           ParamType.double,
+          false,
+        ),
+        whenToTake: deserializeParam(
+          data['when_to_take'],
+          ParamType.DateTime,
           false,
         ),
       );
@@ -192,7 +189,6 @@ class MedicationStruct extends FFFirebaseStruct {
 
   @override
   bool operator ==(Object other) {
-    const listEquality = ListEquality();
     return other is MedicationStruct &&
         medicationName == other.medicationName &&
         dosageAmount == other.dosageAmount &&
@@ -200,8 +196,8 @@ class MedicationStruct extends FFFirebaseStruct {
         pillDosageCount == other.pillDosageCount &&
         withFood == other.withFood &&
         pedestalID == other.pedestalID &&
-        listEquality.equals(whenToTake, other.whenToTake) &&
-        pillWeight == other.pillWeight;
+        pillWeight == other.pillWeight &&
+        whenToTake == other.whenToTake;
   }
 
   @override
@@ -212,8 +208,8 @@ class MedicationStruct extends FFFirebaseStruct {
         pillDosageCount,
         withFood,
         pedestalID,
-        whenToTake,
-        pillWeight
+        pillWeight,
+        whenToTake
       ]);
 }
 
@@ -225,6 +221,7 @@ MedicationStruct createMedicationStruct({
   bool? withFood,
   String? pedestalID,
   double? pillWeight,
+  DateTime? whenToTake,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
@@ -238,6 +235,7 @@ MedicationStruct createMedicationStruct({
       withFood: withFood,
       pedestalID: pedestalID,
       pillWeight: pillWeight,
+      whenToTake: whenToTake,
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,

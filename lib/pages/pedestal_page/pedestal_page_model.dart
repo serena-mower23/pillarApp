@@ -7,6 +7,7 @@ import '/flutter_flow/instant_timer.dart';
 import '/custom_code/actions/index.dart' as actions;
 import 'pedestal_page_widget.dart' show PedestalPageWidget;
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +33,11 @@ class PedestalPageModel extends FlutterFlowModel<PedestalPageWidget> {
   InstantTimer? receiveDataTimer;
   // Stores action output result for [Custom Action - receiveData] action in PedestalPage widget.
   String? receivedData;
+  // State field(s) for Carousel widget.
+  CarouselController? carouselController;
+
+  int carouselCurrentIndex = 1;
+
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;

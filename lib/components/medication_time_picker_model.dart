@@ -1,6 +1,8 @@
+import '/flutter_flow/flutter_flow_checkbox_group.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/form_field_controller.dart';
 import 'medication_time_picker_widget.dart' show MedicationTimePickerWidget;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +40,10 @@ class MedicationTimePickerModel
 
   ///  State fields for stateful widgets in this component.
 
-  DateTime? datePicked1;
-  DateTime? datePicked2;
-  DateTime? datePicked3;
-  DateTime? datePicked4;
-  DateTime? datePicked5;
-  DateTime? datePicked6;
-  DateTime? datePicked7;
+  DateTime? datePicked;
+  // State field(s) for CheckboxGroup widget.
+  List<String>? checkboxGroupValues;
+  FormFieldController<List<String>>? checkboxGroupValueController;
 
   /// Initialization and disposal methods.
 

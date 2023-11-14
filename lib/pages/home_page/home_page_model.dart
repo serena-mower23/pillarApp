@@ -4,7 +4,6 @@ import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/custom_code/actions/index.dart' as actions;
 import 'home_page_widget.dart' show HomePageWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -45,13 +44,18 @@ class HomePageModel extends FlutterFlowModel<HomePageWidget> {
 
   bool deviceSelected = false;
 
+  List<MedInfoStruct> meds = [];
+  void addToMeds(MedInfoStruct item) => meds.add(item);
+  void removeFromMeds(MedInfoStruct item) => meds.remove(item);
+  void removeAtIndexFromMeds(int index) => meds.removeAt(index);
+  void insertAtIndexInMeds(int index, MedInfoStruct item) =>
+      meds.insert(index, item);
+  void updateMedsAtIndex(int index, Function(MedInfoStruct) updateFn) =>
+      meds[index] = updateFn(meds[index]);
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // Stores action output result for [Custom Action - getConnectedDevices] action in HomePage widget.
-  List<BTDeviceStruct>? fetchedConnectedDevice;
-  // Stores action output result for [Custom Action - findDevices] action in HomePage widget.
-  List<BTDeviceStruct>? availableDevices;
 
   /// Initialization and disposal methods.
 

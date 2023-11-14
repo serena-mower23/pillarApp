@@ -1,18 +1,14 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
-import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/custom_code/actions/index.dart' as actions;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'add_med_page_model.dart';
@@ -25,27 +21,10 @@ class AddMedPageWidget extends StatefulWidget {
   _AddMedPageWidgetState createState() => _AddMedPageWidgetState();
 }
 
-class _AddMedPageWidgetState extends State<AddMedPageWidget>
-    with TickerProviderStateMixin {
+class _AddMedPageWidgetState extends State<AddMedPageWidget> {
   late AddMedPageModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  final animationsMap = {
-    'listTileOnActionTriggerAnimation': AnimationInfo(
-      trigger: AnimationTrigger.onActionTrigger,
-      applyInitialState: true,
-      effects: [
-        ScaleEffect(
-          curve: Curves.easeInOut,
-          delay: 600.ms,
-          duration: 600.ms,
-          begin: Offset(1.0, 1.0),
-          end: Offset(1.0, 1.0),
-        ),
-      ],
-    ),
-  };
 
   @override
   void initState() {
@@ -63,13 +42,6 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
 
     _model.pillDosageFieldController ??= TextEditingController();
     _model.pillDosageFieldFocusNode ??= FocusNode();
-
-    setupAnimations(
-      animationsMap.values.where((anim) =>
-          anim.trigger == AnimationTrigger.onActionTrigger ||
-          !anim.applyInitialState),
-      this,
-    );
   }
 
   @override
@@ -403,251 +375,117 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                           style: FlutterFlowTheme.of(context).titleLarge,
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            child: Align(
-                              alignment: AlignmentDirectional(0.00, 0.00),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 8.0, 0.0, 0.0),
-                                child: FFButtonWidget(
-                                  onPressed: () async {
-                                    final _datePickedTime =
-                                        await showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.fromDateTime(
-                                          getCurrentTimestamp),
-                                      builder: (context, child) {
-                                        return wrapInMaterialTimePickerTheme(
-                                          context,
-                                          child!,
-                                          headerBackgroundColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primary,
-                                          headerForegroundColor:
-                                              FlutterFlowTheme.of(context).info,
-                                          headerTextStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineLarge
-                                                  .override(
-                                                    fontFamily: 'Outfit',
-                                                    fontSize: 32.0,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                          pickerBackgroundColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .secondaryBackground,
-                                          pickerForegroundColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primaryText,
-                                          selectedDateTimeBackgroundColor:
-                                              Color(0xFFF5ABCF),
-                                          selectedDateTimeForegroundColor:
-                                              FlutterFlowTheme.of(context).info,
-                                          actionButtonForegroundColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primaryText,
-                                          iconSize: 24.0,
-                                        );
-                                      },
-                                    );
-                                    if (_datePickedTime != null) {
-                                      safeSetState(() {
-                                        _model.datePicked = DateTime(
-                                          getCurrentTimestamp.year,
-                                          getCurrentTimestamp.month,
-                                          getCurrentTimestamp.day,
-                                          _datePickedTime.hour,
-                                          _datePickedTime.minute,
-                                        );
-                                      });
-                                    }
-                                  },
-                                  text: 'Choose Time',
-                                  options: FFButtonOptions(
-                                    height: 40.0,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        24.0, 0.0, 24.0, 0.0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    color: Color(0xFFF5ABCF),
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .override(
-                                          fontFamily: 'Readex Pro',
-                                          color: Colors.white,
-                                        ),
-                                    elevation: 3.0,
-                                    borderSide: BorderSide(
-                                      color: Colors.transparent,
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  1.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                valueOrDefault<String>(
+                                  dateTimeFormat('jm', _model.datePicked),
+                                  'No Time Picked',
                                 ),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    16.0, 16.0, 16.0, 0.0),
-                                child: InkWell(
-                                  splashColor: Colors.transparent,
-                                  focusColor: Colors.transparent,
-                                  hoverColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  onTap: () async {
-                                    setState(() {
-                                      _model.isBluetoothEnabled =
-                                          _model.isBluetoothEnabled;
-                                    });
-                                    setState(() {
-                                      _model.isFetchingDevices = true;
-                                      _model.isFetchingConnectedDevices = true;
-                                    });
-                                    _model.fetchedConnectedDevices =
-                                        await actions.getConnectedDevices();
-                                    setState(() {
-                                      _model.isFetchingConnectedDevices = false;
-                                      _model.connectedDevices = _model
-                                          .fetchedConnectedDevices!
-                                          .toList()
-                                          .cast<BTDeviceStruct>();
-                                    });
-                                    _model.devicesFound =
-                                        await actions.findDevices();
-                                    setState(() {
-                                      _model.isFetchingDevices = false;
-                                      _model.foundDevices = _model.devicesFound!
-                                          .toList()
-                                          .cast<BTDeviceStruct>();
-                                    });
-
-                                    setState(() {});
-                                  },
-                                  child: Icon(
-                                    Icons.refresh,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    size: 24.0,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    16.0, 16.0, 0.0, 0.0),
-                                child: Text(
-                                  'Available Pedestals',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        fontSize: 28.0,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 391.0,
-                            decoration: BoxDecoration(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Padding(
+                            Expanded(
+                              child: Align(
+                                alignment: AlignmentDirectional(0.00, 0.00),
+                                child: Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 20.0, 0.0, 0.0),
-                                  child: Builder(
-                                    builder: (context) {
-                                      final displayAvailableDevices =
-                                          _model.devicesFound!.toList();
-                                      return ListView.builder(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        scrollDirection: Axis.vertical,
-                                        itemCount:
-                                            displayAvailableDevices.length,
-                                        itemBuilder: (context,
-                                            displayAvailableDevicesIndex) {
-                                          final displayAvailableDevicesItem =
-                                              displayAvailableDevices[
-                                                  displayAvailableDevicesIndex];
-                                          return InkWell(
-                                            splashColor: Colors.transparent,
-                                            focusColor: Colors.transparent,
-                                            hoverColor: Colors.transparent,
-                                            highlightColor: Colors.transparent,
-                                            onTap: () async {
-                                              if (animationsMap[
-                                                      'listTileOnActionTriggerAnimation'] !=
-                                                  null) {
-                                                await animationsMap[
-                                                        'listTileOnActionTriggerAnimation']!
-                                                    .controller
-                                                    .forward(from: 0.0);
-                                              }
-                                              _model.hasWrite =
-                                                  await actions.connectDevice(
-                                                displayAvailableDevicesItem,
-                                              );
-                                              setState(() {
-                                                _model.addToConnectedDevices(
-                                                    displayAvailableDevicesItem);
-                                              });
-                                              setState(() {
-                                                _model.selectedDevice =
-                                                    displayAvailableDevicesItem;
-                                              });
-
-                                              setState(() {});
-                                            },
-                                            child: ListTile(
-                                              title: Text(
-                                                displayAvailableDevicesItem
-                                                    .name,
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .titleLarge,
-                                              ),
-                                              subtitle: Text(
-                                                displayAvailableDevicesItem.id,
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .labelMedium,
-                                              ),
-                                              trailing: Icon(
-                                                Icons.arrow_forward_ios,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
-                                                size: 20.0,
-                                              ),
-                                              tileColor: Color(0xFFF1F4F8),
-                                              dense: false,
-                                            ),
-                                          ).animateOnActionTrigger(
-                                            animationsMap[
-                                                'listTileOnActionTriggerAnimation']!,
+                                      0.0, 8.0, 0.0, 0.0),
+                                  child: FFButtonWidget(
+                                    onPressed: () async {
+                                      final _datePickedTime =
+                                          await showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay.fromDateTime(
+                                            getCurrentTimestamp),
+                                        builder: (context, child) {
+                                          return wrapInMaterialTimePickerTheme(
+                                            context,
+                                            child!,
+                                            headerBackgroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .primary,
+                                            headerForegroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .info,
+                                            headerTextStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .headlineLarge
+                                                    .override(
+                                                      fontFamily: 'Outfit',
+                                                      fontSize: 32.0,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                            pickerBackgroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .secondaryBackground,
+                                            pickerForegroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .primaryText,
+                                            selectedDateTimeBackgroundColor:
+                                                Color(0xFFF5ABCF),
+                                            selectedDateTimeForegroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .info,
+                                            actionButtonForegroundColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .primaryText,
+                                            iconSize: 24.0,
                                           );
                                         },
                                       );
+                                      if (_datePickedTime != null) {
+                                        safeSetState(() {
+                                          _model.datePicked = DateTime(
+                                            getCurrentTimestamp.year,
+                                            getCurrentTimestamp.month,
+                                            getCurrentTimestamp.day,
+                                            _datePickedTime.hour,
+                                            _datePickedTime.minute,
+                                          );
+                                        });
+                                      }
+                                      setState(() {
+                                        _model.medicationTime =
+                                            _model.datePicked;
+                                      });
                                     },
+                                    text: 'Choose Time',
+                                    options: FFButtonOptions(
+                                      height: 40.0,
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          24.0, 0.0, 24.0, 0.0),
+                                      iconPadding:
+                                          EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 0.0, 0.0, 0.0),
+                                      color: Color(0xFFF5ABCF),
+                                      textStyle: FlutterFlowTheme.of(context)
+                                          .titleSmall
+                                          .override(
+                                            fontFamily: 'Readex Pro',
+                                            color: Colors.white,
+                                          ),
+                                      elevation: 3.0,
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -655,7 +493,8 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                 Align(
                   alignment: AlignmentDirectional(0.00, 1.00),
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 0.0),
                     child: StreamBuilder<List<UsersRecord>>(
                       stream: queryUsersRecord(),
                       builder: (context, snapshot) {
@@ -677,65 +516,29 @@ class _AddMedPageWidgetState extends State<AddMedPageWidget>
                             snapshot.data!;
                         return FFButtonWidget(
                           onPressed: () async {
-                            setState(() {
-                              _model.medicationTime = _model.datePicked;
-                            });
-
-                            await currentUserReference!.update({
+                            await MedicationsRecord.createDoc(
+                                    currentUserReference!)
+                                .set({
+                              ...createMedicationsRecordData(
+                                medicationName:
+                                    _model.medNameFieldController.text,
+                                dosageAmount: int.tryParse(
+                                    _model.dosageAmountFieldController.text),
+                                pillCount: int.tryParse(
+                                    _model.pillCountFieldController.text),
+                                pillDosageCount: int.tryParse(
+                                    _model.pillDosageFieldController.text),
+                                withFood: _model.withFoodTileValue,
+                                userID: currentUserReference,
+                              ),
                               ...mapToFirestore(
                                 {
-                                  'medications': FieldValue.arrayUnion([
-                                    getMedicationFirestoreData(
-                                      createMedicationStruct(
-                                        medicationName:
-                                            _model.medNameFieldController.text,
-                                        dosageAmount: _model
-                                            .dosageAmountFieldController.text,
-                                        pillCount: _model
-                                            .pillCountFieldController.text,
-                                        pillDosageCount: _model
-                                            .pillDosageFieldController.text,
-                                        withFood: _model.withFoodTileValue,
-                                        pedestalID: _model.selectedDevice?.id,
-                                        whenToTake: _model.medicationTime,
-                                        clearUnsetFields: false,
-                                      ),
-                                      true,
-                                    )
-                                  ]),
+                                  'when_to_take': [_model.datePicked],
                                 },
                               ),
                             });
-                            await actions.sendData(
-                              _model.selectedDevice!,
-                              _model.medNameFieldController.text,
-                            );
-                            await actions.sendData(
-                              _model.selectedDevice!,
-                              _model.dosageAmountFieldController.text,
-                            );
-                            await actions.sendMedicationTimes(
-                              _model.selectedDevice!,
-                              _model.medicationTime,
-                            );
 
-                            context.pushNamed(
-                              'PedestalPage',
-                              queryParameters: {
-                                'deviceName': serializeParam(
-                                  _model.selectedDevice?.name,
-                                  ParamType.String,
-                                ),
-                                'deviceId': serializeParam(
-                                  _model.selectedDevice?.id,
-                                  ParamType.String,
-                                ),
-                                'deviceRssi': serializeParam(
-                                  _model.selectedDevice?.rssi,
-                                  ParamType.int,
-                                ),
-                              }.withoutNulls,
-                            );
+                            context.pushNamed('HomePage');
                           },
                           text: 'Add Medication',
                           options: FFButtonOptions(

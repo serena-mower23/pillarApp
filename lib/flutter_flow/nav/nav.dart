@@ -113,15 +113,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: '/medicationPage',
           builder: (context, params) => MedicationPageWidget(
             medicationName: params.getParam('medicationName', ParamType.String),
-            docID: params.getParam('docID', ParamType.String),
-            dosageAmount: params.getParam('dosageAmount', ParamType.String),
-            pillCount: params.getParam('pillCount', ParamType.String),
-            pillDosageCount:
-                params.getParam('pillDosageCount', ParamType.String),
-            withFood: params.getParam('withFood', ParamType.bool),
-            medicationTime:
-                params.getParam('medicationTime', ParamType.DateTime),
-            pillWeight: params.getParam('pillWeight', ParamType.String),
+            medID: params.getParam('medID', ParamType.DocumentReference, false,
+                ['users', 'medications']),
           ),
         ),
         FFRoute(
@@ -136,6 +129,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             deviceName: params.getParam('deviceName', ParamType.String),
             deviceId: params.getParam('deviceId', ParamType.String),
             deviceRssi: params.getParam('deviceRssi', ParamType.int),
+            medID: params.getParam('medID', ParamType.DocumentReference, false,
+                ['users', 'medications']),
           ),
         ),
         FFRoute(
@@ -147,11 +142,8 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'ConnectPage',
           path: '/connectPage',
           builder: (context, params) => ConnectPageWidget(
-            medicationName: params.getParam('medicationName', ParamType.String),
-            medicationDosageAmount:
-                params.getParam('medicationDosageAmount', ParamType.String),
-            medicationTime:
-                params.getParam('medicationTime', ParamType.DateTime),
+            medID: params.getParam('medID', ParamType.DocumentReference, false,
+                ['users', 'medications']),
           ),
         ),
         FFRoute(

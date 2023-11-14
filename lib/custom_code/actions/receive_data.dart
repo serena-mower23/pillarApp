@@ -19,6 +19,10 @@ Future<String?> receiveData(BTDeviceStruct deviceInfo) async {
       final isNotify = characteristic.properties.notify;
       if (isRead && isNotify) {
         final value = await characteristic.read();
+        String stringValue = String.fromCharCodes(value);
+        if (stringValue.contains("Weight")) {
+          return String.fromCharCodes(value);
+        }
         return String.fromCharCodes(value);
       }
     }

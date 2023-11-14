@@ -26,11 +26,6 @@ class UsersRecord extends FirestoreRecord {
   DateTime? get createdTime => _createdTime;
   bool hasCreatedTime() => _createdTime != null;
 
-  // "medications" field.
-  List<MedicationStruct>? _medications;
-  List<MedicationStruct> get medications => _medications ?? const [];
-  bool hasMedications() => _medications != null;
-
   // "password" field.
   String? _password;
   String get password => _password ?? '';
@@ -61,19 +56,24 @@ class UsersRecord extends FirestoreRecord {
   String get displayName => _displayName ?? '';
   bool hasDisplayName() => _displayName != null;
 
+  // "medications" field.
+  List<MedInfoStruct>? _medications;
+  List<MedInfoStruct> get medications => _medications ?? const [];
+  bool hasMedications() => _medications != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _createdTime = snapshotData['created_time'] as DateTime?;
-    _medications = getStructList(
-      snapshotData['medications'],
-      MedicationStruct.fromMap,
-    );
     _password = snapshotData['password'] as String?;
     _uid = snapshotData['uid'] as String?;
     _photoUrl = snapshotData['photo_url'] as String?;
     _phoneNumber = snapshotData['phone_number'] as String?;
     _username = snapshotData['username'] as String?;
     _displayName = snapshotData['display_name'] as String?;
+    _medications = getStructList(
+      snapshotData['medications'],
+      MedInfoStruct.fromMap,
+    );
   }
 
   static CollectionReference get collection =>
@@ -143,26 +143,26 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
     const listEquality = ListEquality();
     return e1?.email == e2?.email &&
         e1?.createdTime == e2?.createdTime &&
-        listEquality.equals(e1?.medications, e2?.medications) &&
         e1?.password == e2?.password &&
         e1?.uid == e2?.uid &&
         e1?.photoUrl == e2?.photoUrl &&
         e1?.phoneNumber == e2?.phoneNumber &&
         e1?.username == e2?.username &&
-        e1?.displayName == e2?.displayName;
+        e1?.displayName == e2?.displayName &&
+        listEquality.equals(e1?.medications, e2?.medications);
   }
 
   @override
   int hash(UsersRecord? e) => const ListEquality().hash([
         e?.email,
         e?.createdTime,
-        e?.medications,
         e?.password,
         e?.uid,
         e?.photoUrl,
         e?.phoneNumber,
         e?.username,
-        e?.displayName
+        e?.displayName,
+        e?.medications
       ]);
 
   @override

@@ -17,14 +17,10 @@ export 'connect_page_model.dart';
 class ConnectPageWidget extends StatefulWidget {
   const ConnectPageWidget({
     Key? key,
-    required this.medicationName,
-    required this.medicationDosageAmount,
-    required this.medicationTime,
+    required this.medID,
   }) : super(key: key);
 
-  final String? medicationName;
-  final String? medicationDosageAmount;
-  final DateTime? medicationTime;
+  final DocumentReference? medID;
 
   @override
   _ConnectPageWidgetState createState() => _ConnectPageWidgetState();
@@ -128,132 +124,118 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
-                child: Text(
-                  'Available Pedestals',
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        fontFamily: 'Readex Pro',
-                        fontSize: 28.0,
-                      ),
-                ),
-              ),
-              Container(
-                width: 391.0,
-                decoration: BoxDecoration(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
-                      child: Builder(
-                        builder: (context) {
-                          final displayAvailableDevices = _model.devicesFound!
-                              .where((e) => e.name == 'Arduino')
-                              .toList();
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: displayAvailableDevices.length,
-                            itemBuilder:
-                                (context, displayAvailableDevicesIndex) {
-                              final displayAvailableDevicesItem =
-                                  displayAvailableDevices[
-                                      displayAvailableDevicesIndex];
-                              return InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  _model.hasWrite = await actions.connectDevice(
-                                    displayAvailableDevicesItem,
-                                  );
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+                    child: Text(
+                      'Available Pedestals',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'Readex Pro',
+                            fontSize: 28.0,
+                          ),
+                    ),
+                  ),
+                  Container(
+                    width: 391.0,
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 20.0, 0.0, 0.0),
+                          child: Builder(
+                            builder: (context) {
+                              final displayAvailableDevices =
+                                  _model.devicesFound!.toList();
+                              return ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: displayAvailableDevices.length,
+                                itemBuilder:
+                                    (context, displayAvailableDevicesIndex) {
+                                  final displayAvailableDevicesItem =
+                                      displayAvailableDevices[
+                                          displayAvailableDevicesIndex];
+                                  return InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      _model.hasWrite =
+                                          await actions.connectDevice(
+                                        displayAvailableDevicesItem,
+                                      );
+                                      setState(() {
+                                        _model.addToConnectedDevices(
+                                            displayAvailableDevicesItem);
+                                      });
 
-                                  await currentUserReference!.update({
-                                    ...mapToFirestore(
-                                      {
-                                        'medications':
-                                            getMedicationListFirestoreData(
-                                          (currentUserDocument?.medications
-                                                      ?.toList() ??
-                                                  [])
-                                              .where((e) =>
-                                                  e.medicationName ==
-                                                  widget.medicationName)
-                                              .toList(),
-                                        ),
-                                      },
-                                    ),
-                                  });
-                                  setState(() {
-                                    _model.addToConnectedDevices(
-                                        displayAvailableDevicesItem);
-                                  });
-                                  setState(() {});
-                                  await actions.sendData(
-                                    displayAvailableDevicesItem,
-                                    widget.medicationName!,
-                                  );
-                                  await actions.sendData(
-                                    displayAvailableDevicesItem,
-                                    widget.medicationDosageAmount!,
-                                  );
-                                  await actions.sendMedicationTimes(
-                                    displayAvailableDevicesItem,
-                                    widget.medicationTime,
-                                  );
+                                      await widget.medID!
+                                          .update(createMedicationsRecordData(
+                                        pedestalID:
+                                            displayAvailableDevicesItem.id,
+                                      ));
 
-                                  context.pushNamed(
-                                    'PedestalPage',
-                                    queryParameters: {
-                                      'deviceName': serializeParam(
+                                      context.pushNamed(
+                                        'PedestalPage',
+                                        queryParameters: {
+                                          'deviceName': serializeParam(
+                                            displayAvailableDevicesItem.name,
+                                            ParamType.String,
+                                          ),
+                                          'deviceId': serializeParam(
+                                            displayAvailableDevicesItem.id,
+                                            ParamType.String,
+                                          ),
+                                          'deviceRssi': serializeParam(
+                                            displayAvailableDevicesItem.rssi,
+                                            ParamType.int,
+                                          ),
+                                          'medID': serializeParam(
+                                            widget.medID,
+                                            ParamType.DocumentReference,
+                                          ),
+                                        }.withoutNulls,
+                                      );
+
+                                      setState(() {});
+                                    },
+                                    child: ListTile(
+                                      title: Text(
                                         displayAvailableDevicesItem.name,
-                                        ParamType.String,
+                                        style: FlutterFlowTheme.of(context)
+                                            .titleLarge,
                                       ),
-                                      'deviceId': serializeParam(
+                                      subtitle: Text(
                                         displayAvailableDevicesItem.id,
-                                        ParamType.String,
+                                        style: FlutterFlowTheme.of(context)
+                                            .labelMedium,
                                       ),
-                                      'deviceRssi': serializeParam(
-                                        displayAvailableDevicesItem.rssi,
-                                        ParamType.int,
+                                      trailing: Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+                                        size: 20.0,
                                       ),
-                                    }.withoutNulls,
+                                      tileColor: Color(0xFFF1F4F8),
+                                      dense: false,
+                                    ),
                                   );
-
-                                  setState(() {});
                                 },
-                                child: ListTile(
-                                  title: Text(
-                                    displayAvailableDevicesItem.name,
-                                    style:
-                                        FlutterFlowTheme.of(context).titleLarge,
-                                  ),
-                                  subtitle: Text(
-                                    displayAvailableDevicesItem.id,
-                                    style: FlutterFlowTheme.of(context)
-                                        .labelMedium,
-                                  ),
-                                  trailing: Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryText,
-                                    size: 20.0,
-                                  ),
-                                  tileColor: Color(0xFFF1F4F8),
-                                  dense: false,
-                                ),
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
@@ -293,6 +275,110 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+                    child: Text(
+                      'Connected Pedestals',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'Readex Pro',
+                            fontSize: 28.0,
+                          ),
+                    ),
+                  ),
+                  Container(
+                    width: 391.0,
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 20.0, 0.0, 0.0),
+                          child: Builder(
+                            builder: (context) {
+                              final displayConnectedDevices =
+                                  _model.fetchedConnectedDevices!.toList();
+                              return ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: displayConnectedDevices.length,
+                                itemBuilder:
+                                    (context, displayConnectedDevicesIndex) {
+                                  final displayConnectedDevicesItem =
+                                      displayConnectedDevices[
+                                          displayConnectedDevicesIndex];
+                                  return InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      await actions.connectDevice(
+                                        displayConnectedDevicesItem,
+                                      );
+                                      setState(() {
+                                        _model.addToConnectedDevices(
+                                            displayConnectedDevicesItem);
+                                      });
+
+                                      context.pushNamed(
+                                        'PedestalPage',
+                                        queryParameters: {
+                                          'deviceName': serializeParam(
+                                            displayConnectedDevicesItem.name,
+                                            ParamType.String,
+                                          ),
+                                          'deviceId': serializeParam(
+                                            displayConnectedDevicesItem.id,
+                                            ParamType.String,
+                                          ),
+                                          'deviceRssi': serializeParam(
+                                            displayConnectedDevicesItem.rssi,
+                                            ParamType.int,
+                                          ),
+                                          'medID': serializeParam(
+                                            widget.medID,
+                                            ParamType.DocumentReference,
+                                          ),
+                                        }.withoutNulls,
+                                      );
+                                    },
+                                    child: ListTile(
+                                      title: Text(
+                                        displayConnectedDevicesItem.name,
+                                        style: FlutterFlowTheme.of(context)
+                                            .titleLarge,
+                                      ),
+                                      subtitle: Text(
+                                        displayConnectedDevicesItem.id,
+                                        style: FlutterFlowTheme.of(context)
+                                            .labelMedium,
+                                      ),
+                                      trailing: Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+                                        size: 20.0,
+                                      ),
+                                      tileColor: Color(0xFFF1F4F8),
+                                      dense: false,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

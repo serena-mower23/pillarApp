@@ -18,6 +18,8 @@ class MedicationStruct extends FFFirebaseStruct {
     String? pedestalID,
     double? pillWeight,
     DateTime? whenToTake,
+    DocumentReference? userID,
+    String? medID,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _medicationName = medicationName,
         _dosageAmount = dosageAmount,
@@ -27,6 +29,8 @@ class MedicationStruct extends FFFirebaseStruct {
         _pedestalID = pedestalID,
         _pillWeight = pillWeight,
         _whenToTake = whenToTake,
+        _userID = userID,
+        _medID = medID,
         super(firestoreUtilData);
 
   // "medication_name" field.
@@ -78,6 +82,18 @@ class MedicationStruct extends FFFirebaseStruct {
   set whenToTake(DateTime? val) => _whenToTake = val;
   bool hasWhenToTake() => _whenToTake != null;
 
+  // "userID" field.
+  DocumentReference? _userID;
+  DocumentReference? get userID => _userID;
+  set userID(DocumentReference? val) => _userID = val;
+  bool hasUserID() => _userID != null;
+
+  // "medID" field.
+  String? _medID;
+  String get medID => _medID ?? '';
+  set medID(String? val) => _medID = val;
+  bool hasMedID() => _medID != null;
+
   static MedicationStruct fromMap(Map<String, dynamic> data) =>
       MedicationStruct(
         medicationName: data['medication_name'] as String?,
@@ -88,6 +104,8 @@ class MedicationStruct extends FFFirebaseStruct {
         pedestalID: data['pedestalID'] as String?,
         pillWeight: castToType<double>(data['pill_weight']),
         whenToTake: data['when_to_take'] as DateTime?,
+        userID: data['userID'] as DocumentReference?,
+        medID: data['medID'] as String?,
       );
 
   static MedicationStruct? maybeFromMap(dynamic data) =>
@@ -102,6 +120,8 @@ class MedicationStruct extends FFFirebaseStruct {
         'pedestalID': _pedestalID,
         'pill_weight': _pillWeight,
         'when_to_take': _whenToTake,
+        'userID': _userID,
+        'medID': _medID,
       }.withoutNulls;
 
   @override
@@ -137,6 +157,14 @@ class MedicationStruct extends FFFirebaseStruct {
         'when_to_take': serializeParam(
           _whenToTake,
           ParamType.DateTime,
+        ),
+        'userID': serializeParam(
+          _userID,
+          ParamType.DocumentReference,
+        ),
+        'medID': serializeParam(
+          _medID,
+          ParamType.String,
         ),
       }.withoutNulls;
 
@@ -182,6 +210,17 @@ class MedicationStruct extends FFFirebaseStruct {
           ParamType.DateTime,
           false,
         ),
+        userID: deserializeParam(
+          data['userID'],
+          ParamType.DocumentReference,
+          false,
+          collectionNamePath: ['users'],
+        ),
+        medID: deserializeParam(
+          data['medID'],
+          ParamType.String,
+          false,
+        ),
       );
 
   @override
@@ -197,7 +236,9 @@ class MedicationStruct extends FFFirebaseStruct {
         withFood == other.withFood &&
         pedestalID == other.pedestalID &&
         pillWeight == other.pillWeight &&
-        whenToTake == other.whenToTake;
+        whenToTake == other.whenToTake &&
+        userID == other.userID &&
+        medID == other.medID;
   }
 
   @override
@@ -209,7 +250,9 @@ class MedicationStruct extends FFFirebaseStruct {
         withFood,
         pedestalID,
         pillWeight,
-        whenToTake
+        whenToTake,
+        userID,
+        medID
       ]);
 }
 
@@ -222,6 +265,8 @@ MedicationStruct createMedicationStruct({
   String? pedestalID,
   double? pillWeight,
   DateTime? whenToTake,
+  DocumentReference? userID,
+  String? medID,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
@@ -236,6 +281,8 @@ MedicationStruct createMedicationStruct({
       pedestalID: pedestalID,
       pillWeight: pillWeight,
       whenToTake: whenToTake,
+      userID: userID,
+      medID: medID,
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,

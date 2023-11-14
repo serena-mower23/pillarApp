@@ -1,10 +1,8 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/components/medication_time_picker_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -397,31 +395,6 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
                             snapshot.data!;
                         return FFButtonWidget(
                           onPressed: () async {
-                            await currentUserReference!.update({
-                              ...mapToFirestore(
-                                {
-                                  'medications': FieldValue.arrayUnion([
-                                    getMedicationFirestoreData(
-                                      createMedicationStruct(
-                                        medicationName:
-                                            _model.medNameFieldController.text,
-                                        dosageAmount: _model
-                                            .dosageAmountFieldController.text,
-                                        pillCount: _model
-                                            .pillCountFieldController.text,
-                                        pillDosageCount: _model
-                                            .pillDosageFieldController.text,
-                                        withFood: _model.withFoodTileValue,
-                                        pedestalID: '',
-                                        clearUnsetFields: false,
-                                      ),
-                                      true,
-                                    )
-                                  ]),
-                                },
-                              ),
-                            });
-
                             context.pushNamed('HomePage');
                           },
                           text: 'Add Medication',

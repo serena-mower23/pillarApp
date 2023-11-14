@@ -46,9 +46,7 @@ class ConnectPageModel extends FlutterFlowModel<ConnectPageWidget> {
 
   bool deviceSelected = false;
 
-  TimeListStruct? medicationTimes;
-  void updateMedicationTimesStruct(Function(TimeListStruct) updateFn) =>
-      updateFn(medicationTimes ??= TimeListStruct());
+  DocumentReference? medID;
 
   ///  State fields for stateful widgets in this page.
 

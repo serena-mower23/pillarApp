@@ -8,14 +8,11 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-Future<MedicationStruct?> getMedicationInfo(
-  String medicationName,
-  String docID,
-) async {
+Future<MedicationStruct?> getMedicationInfo(String medID) async {
   final db = FirebaseFirestore.instance;
 
-  final collection = db.collection('user');
-  final document = collection.doc(docID);
+  final collection = db.collection('medications');
+  final document = collection.doc(medID);
 
   MedicationStruct? medInfo = null;
 
@@ -23,7 +20,7 @@ Future<MedicationStruct?> getMedicationInfo(
     if (docSnapshot.exists) {
       final listData = docSnapshot.data()?['medications'];
       for (String listItem in listData) {
-        if (listItem.contains(medicationName)) {
+        if (listItem.contains(medID)) {
           medInfo = listItem as MedicationStruct;
           break;
         }

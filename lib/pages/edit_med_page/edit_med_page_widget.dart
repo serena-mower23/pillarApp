@@ -1,33 +1,40 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/schema/structs/index.dart';
 import '/components/medication_time_picker_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'edit_medication_page_model.dart';
-export 'edit_medication_page_model.dart';
+import 'edit_med_page_model.dart';
+export 'edit_med_page_model.dart';
 
-class EditMedicationPageWidget extends StatefulWidget {
-  const EditMedicationPageWidget({Key? key}) : super(key: key);
+class EditMedPageWidget extends StatefulWidget {
+  const EditMedPageWidget({
+    Key? key,
+    required this.medID,
+  }) : super(key: key);
+
+  final DocumentReference? medID;
 
   @override
-  _EditMedicationPageWidgetState createState() =>
-      _EditMedicationPageWidgetState();
+  _EditMedPageWidgetState createState() => _EditMedPageWidgetState();
 }
 
-class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
-  late EditMedicationPageModel _model;
+class _EditMedPageWidgetState extends State<EditMedPageWidget> {
+  late EditMedPageModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => EditMedicationPageModel());
+    _model = createModel(context, () => EditMedPageModel());
 
     _model.medNameFieldController ??= TextEditingController();
     _model.medNameFieldFocusNode ??= FocusNode();
@@ -76,23 +83,38 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
-              context.safePop();
+              context.pushNamed(
+                'MedicationPage',
+                queryParameters: {
+                  'medicationName': serializeParam(
+                    '',
+                    ParamType.String,
+                  ),
+                  'medID': serializeParam(
+                    widget.medID,
+                    ParamType.DocumentReference,
+                  ),
+                }.withoutNulls,
+              );
             },
             child: Icon(
-              Icons.arrow_back_ios_new,
-              color: Color(0xFFF1F4F8),
+              Icons.arrow_back_ios,
+              color: Colors.white,
               size: 24.0,
             ),
           ),
-          title: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(48.0, 0.0, 0.0, 0.0),
-            child: Text(
-              'Edit Medication',
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Outfit',
-                    color: Colors.white,
-                    fontSize: 22.0,
-                  ),
+          title: Align(
+            alignment: AlignmentDirectional(0.00, -1.00),
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 50.0, 0.0),
+              child: Text(
+                'Edit Medication',
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Outfit',
+                      color: Colors.white,
+                      fontSize: 22.0,
+                    ),
+              ),
             ),
           ),
           actions: [],
@@ -119,7 +141,7 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
                           focusNode: _model.medNameFieldFocusNode,
                           onFieldSubmitted: (_) async {
                             setState(() {
-                              _model.medNameFieldController?.text =
+                              _model.dosageAmountFieldController?.text =
                                   _model.medNameFieldController.text;
                             });
                           },
@@ -362,18 +384,133 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
                           controlAffinity: ListTileControlAffinity.trailing,
                         ),
                       ),
-                      wrapWithModel(
-                        model: _model.medicationTimePickerModel,
-                        updateCallback: () => setState(() {}),
-                        child: MedicationTimePickerWidget(),
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                        child: Text(
+                          'Add Medication Times',
+                          style: FlutterFlowTheme.of(context).titleLarge,
+                        ),
                       ),
                     ],
                   ),
                 ),
+                wrapWithModel(
+                  model: _model.medicationTimePickerModel,
+                  updateCallback: () => setState(() {}),
+                  child: MedicationTimePickerWidget(),
+                ),
+                FFButtonWidget(
+                  onPressed: () async {
+                    setState(() {
+                      _model.addToMedTimes(MedTimeStruct(
+                        hour: int.tryParse(_model
+                            .medicationTimePickerModel.textController1.text),
+                        minute: int.tryParse(_model
+                            .medicationTimePickerModel.textController2.text),
+                        isAM: _model.medicationTimePickerModel.dropDownValue1 ==
+                            'AM',
+                        daysOfTheWeek:
+                            _model.medicationTimePickerModel.dropDownValue2,
+                      ));
+                    });
+                  },
+                  text: 'Add Time',
+                  options: FFButtonOptions(
+                    height: 40.0,
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+                    iconPadding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    color: Color(0xFFF5ABCF),
+                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                          fontFamily: 'Readex Pro',
+                          color: Colors.white,
+                        ),
+                    elevation: 3.0,
+                    borderSide: BorderSide(
+                      color: Colors.transparent,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Current Med Schedule',
+                        style: FlutterFlowTheme.of(context).titleLarge,
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: Builder(
+                        builder: (context) {
+                          final times = _model.medTimes.toList();
+                          return ListView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemCount: times.length,
+                            itemBuilder: (context, timesIndex) {
+                              final timesItem = times[timesIndex];
+                              return Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          '${formatNumber(
+                                            timesItem.hour,
+                                            formatType: FormatType.custom,
+                                            format: '#0',
+                                            locale: '',
+                                          )}:${timesItem.minute.toString()}${timesItem.isAM == true ? 'AM' : 'PM'}',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          timesItem.daysOfTheWeek.length
+                                              .toString(),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
                 Align(
                   alignment: AlignmentDirectional(0.00, 1.00),
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 0.0),
                     child: StreamBuilder<List<UsersRecord>>(
                       stream: queryUsersRecord(),
                       builder: (context, snapshot) {
@@ -395,9 +532,33 @@ class _EditMedicationPageWidgetState extends State<EditMedicationPageWidget> {
                             snapshot.data!;
                         return FFButtonWidget(
                           onPressed: () async {
+                            await MedicationsRecord.createDoc(
+                                    currentUserReference!)
+                                .set({
+                              ...createMedicationsRecordData(
+                                medicationName:
+                                    _model.medNameFieldController.text,
+                                dosageAmount: int.tryParse(
+                                    _model.dosageAmountFieldController.text),
+                                pillCount: int.tryParse(
+                                    _model.pillCountFieldController.text),
+                                pillDosageCount: int.tryParse(
+                                    _model.pillDosageFieldController.text),
+                                withFood: _model.withFoodTileValue,
+                                userID: currentUserReference,
+                              ),
+                              ...mapToFirestore(
+                                {
+                                  'when_to_take': getMedTimeListFirestoreData(
+                                    _model.medTimes,
+                                  ),
+                                },
+                              ),
+                            });
+
                             context.pushNamed('HomePage');
                           },
-                          text: 'Add Medication',
+                          text: 'Edit Medication',
                           options: FFButtonOptions(
                             height: 40.0,
                             padding: EdgeInsetsDirectional.fromSTEB(

@@ -1,17 +1,62 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/schema/structs/index.dart';
 import '/components/medication_time_picker_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'edit_medication_page_widget.dart' show EditMedicationPageWidget;
+import 'edit_med_page_widget.dart' show EditMedPageWidget;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class EditMedicationPageModel
-    extends FlutterFlowModel<EditMedicationPageWidget> {
+class EditMedPageModel extends FlutterFlowModel<EditMedPageWidget> {
+  ///  Local state fields for this page.
+
+  bool isFetchingDevices = false;
+
+  bool isBluetoothEnabled = false;
+
+  List<BTDeviceStruct> foundDevices = [];
+  void addToFoundDevices(BTDeviceStruct item) => foundDevices.add(item);
+  void removeFromFoundDevices(BTDeviceStruct item) => foundDevices.remove(item);
+  void removeAtIndexFromFoundDevices(int index) => foundDevices.removeAt(index);
+  void insertAtIndexInFoundDevices(int index, BTDeviceStruct item) =>
+      foundDevices.insert(index, item);
+  void updateFoundDevicesAtIndex(
+          int index, Function(BTDeviceStruct) updateFn) =>
+      foundDevices[index] = updateFn(foundDevices[index]);
+
+  List<BTDeviceStruct> connectedDevices = [];
+  void addToConnectedDevices(BTDeviceStruct item) => connectedDevices.add(item);
+  void removeFromConnectedDevices(BTDeviceStruct item) =>
+      connectedDevices.remove(item);
+  void removeAtIndexFromConnectedDevices(int index) =>
+      connectedDevices.removeAt(index);
+  void insertAtIndexInConnectedDevices(int index, BTDeviceStruct item) =>
+      connectedDevices.insert(index, item);
+  void updateConnectedDevicesAtIndex(
+          int index, Function(BTDeviceStruct) updateFn) =>
+      connectedDevices[index] = updateFn(connectedDevices[index]);
+
+  bool isFetchingConnectedDevices = false;
+
+  BTDeviceStruct? selectedDevice;
+  void updateSelectedDeviceStruct(Function(BTDeviceStruct) updateFn) =>
+      updateFn(selectedDevice ??= BTDeviceStruct());
+
+  List<MedTimeStruct> medTimes = [];
+  void addToMedTimes(MedTimeStruct item) => medTimes.add(item);
+  void removeFromMedTimes(MedTimeStruct item) => medTimes.remove(item);
+  void removeAtIndexFromMedTimes(int index) => medTimes.removeAt(index);
+  void insertAtIndexInMedTimes(int index, MedTimeStruct item) =>
+      medTimes.insert(index, item);
+  void updateMedTimesAtIndex(int index, Function(MedTimeStruct) updateFn) =>
+      medTimes[index] = updateFn(medTimes[index]);
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();

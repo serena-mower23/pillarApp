@@ -26,5 +26,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:755117112276:ios:15bbab6fb6a42a3a827441</string>
+	<key>DATABASE_URL</key>
+	<string>https://pillartest-951cb-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>

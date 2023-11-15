@@ -41,21 +41,6 @@ class MedicationsRecord extends FirestoreRecord {
   bool get withFood => _withFood ?? false;
   bool hasWithFood() => _withFood != null;
 
-  // "pedestalID" field.
-  String? _pedestalID;
-  String get pedestalID => _pedestalID ?? '';
-  bool hasPedestalID() => _pedestalID != null;
-
-  // "pill_weight" field.
-  double? _pillWeight;
-  double get pillWeight => _pillWeight ?? 0.0;
-  bool hasPillWeight() => _pillWeight != null;
-
-  // "when_to_take" field.
-  List<DateTime>? _whenToTake;
-  List<DateTime> get whenToTake => _whenToTake ?? const [];
-  bool hasWhenToTake() => _whenToTake != null;
-
   // "userID" field.
   DocumentReference? _userID;
   DocumentReference? get userID => _userID;
@@ -66,6 +51,26 @@ class MedicationsRecord extends FirestoreRecord {
   String get medID => _medID ?? '';
   bool hasMedID() => _medID != null;
 
+  // "pedestalInfo" field.
+  BTDeviceStruct? _pedestalInfo;
+  BTDeviceStruct get pedestalInfo => _pedestalInfo ?? BTDeviceStruct();
+  bool hasPedestalInfo() => _pedestalInfo != null;
+
+  // "pill_weight" field.
+  String? _pillWeight;
+  String get pillWeight => _pillWeight ?? '';
+  bool hasPillWeight() => _pillWeight != null;
+
+  // "pill_bottle_weight" field.
+  String? _pillBottleWeight;
+  String get pillBottleWeight => _pillBottleWeight ?? '';
+  bool hasPillBottleWeight() => _pillBottleWeight != null;
+
+  // "when_to_take" field.
+  List<MedTimeStruct>? _whenToTake;
+  List<MedTimeStruct> get whenToTake => _whenToTake ?? const [];
+  bool hasWhenToTake() => _whenToTake != null;
+
   DocumentReference get parentReference => reference.parent.parent!;
 
   void _initializeFields() {
@@ -74,11 +79,15 @@ class MedicationsRecord extends FirestoreRecord {
     _pillCount = castToType<int>(snapshotData['pill_count']);
     _pillDosageCount = castToType<int>(snapshotData['pill_dosage_count']);
     _withFood = snapshotData['with_food'] as bool?;
-    _pedestalID = snapshotData['pedestalID'] as String?;
-    _pillWeight = castToType<double>(snapshotData['pill_weight']);
-    _whenToTake = getDataList(snapshotData['when_to_take']);
     _userID = snapshotData['userID'] as DocumentReference?;
     _medID = snapshotData['medID'] as String?;
+    _pedestalInfo = BTDeviceStruct.maybeFromMap(snapshotData['pedestalInfo']);
+    _pillWeight = snapshotData['pill_weight'] as String?;
+    _pillBottleWeight = snapshotData['pill_bottle_weight'] as String?;
+    _whenToTake = getStructList(
+      snapshotData['when_to_take'],
+      MedTimeStruct.fromMap,
+    );
   }
 
   static Query<Map<String, dynamic>> collection([DocumentReference? parent]) =>
@@ -126,10 +135,11 @@ Map<String, dynamic> createMedicationsRecordData({
   int? pillCount,
   int? pillDosageCount,
   bool? withFood,
-  String? pedestalID,
-  double? pillWeight,
   DocumentReference? userID,
   String? medID,
+  BTDeviceStruct? pedestalInfo,
+  String? pillWeight,
+  String? pillBottleWeight,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -138,12 +148,16 @@ Map<String, dynamic> createMedicationsRecordData({
       'pill_count': pillCount,
       'pill_dosage_count': pillDosageCount,
       'with_food': withFood,
-      'pedestalID': pedestalID,
-      'pill_weight': pillWeight,
       'userID': userID,
       'medID': medID,
+      'pedestalInfo': BTDeviceStruct().toMap(),
+      'pill_weight': pillWeight,
+      'pill_bottle_weight': pillBottleWeight,
     }.withoutNulls,
   );
+
+  // Handle nested data for "pedestalInfo" field.
+  addBTDeviceStructData(firestoreData, pedestalInfo, 'pedestalInfo');
 
   return firestoreData;
 }
@@ -159,11 +173,12 @@ class MedicationsRecordDocumentEquality implements Equality<MedicationsRecord> {
         e1?.pillCount == e2?.pillCount &&
         e1?.pillDosageCount == e2?.pillDosageCount &&
         e1?.withFood == e2?.withFood &&
-        e1?.pedestalID == e2?.pedestalID &&
-        e1?.pillWeight == e2?.pillWeight &&
-        listEquality.equals(e1?.whenToTake, e2?.whenToTake) &&
         e1?.userID == e2?.userID &&
-        e1?.medID == e2?.medID;
+        e1?.medID == e2?.medID &&
+        e1?.pedestalInfo == e2?.pedestalInfo &&
+        e1?.pillWeight == e2?.pillWeight &&
+        e1?.pillBottleWeight == e2?.pillBottleWeight &&
+        listEquality.equals(e1?.whenToTake, e2?.whenToTake);
   }
 
   @override
@@ -173,11 +188,12 @@ class MedicationsRecordDocumentEquality implements Equality<MedicationsRecord> {
         e?.pillCount,
         e?.pillDosageCount,
         e?.withFood,
-        e?.pedestalID,
-        e?.pillWeight,
-        e?.whenToTake,
         e?.userID,
-        e?.medID
+        e?.medID,
+        e?.pedestalInfo,
+        e?.pillWeight,
+        e?.pillBottleWeight,
+        e?.whenToTake
       ]);
 
   @override

@@ -1,3 +1,4 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -109,7 +110,7 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                 hoverColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onTap: () async {
-                  context.safePop();
+                  context.pushNamed('HomePage');
                 },
                 child: Icon(
                   Icons.arrow_back_ios,
@@ -144,25 +145,12 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 0.0, 0.0),
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 0.0, 16.0, 0.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Text(
-                                  'Medication Name:',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        fontSize: 18.0,
-                                      ),
-                                ),
-                              ],
-                            ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   16.0, 0.0, 0.0, 0.0),
@@ -173,7 +161,7 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                     medicationPageMedicationsRecord
                                         .medicationName,
                                     style:
-                                        FlutterFlowTheme.of(context).bodyMedium,
+                                        FlutterFlowTheme.of(context).titleLarge,
                                   ),
                                 ],
                               ),
@@ -362,8 +350,8 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                       16.0, 0.0, 0.0, 0.0),
                                   child: Text(
                                     valueOrDefault<String>(
-                                      medicationPageMedicationsRecord.pillWeight
-                                          .toString(),
+                                      medicationPageMedicationsRecord
+                                          .pillWeight,
                                       'No Weight Recorded',
                                     ),
                                     style:
@@ -375,472 +363,129 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                           ],
                         ),
                       ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Align(
+                      Flexible(
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              16.0, 8.0, 16.0, 8.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Text(
+                                'Pill Bottle Weight:',
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      fontSize: 18.0,
+                                    ),
+                              ),
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    16.0, 0.0, 0.0, 0.0),
+                                child: Text(
+                                  valueOrDefault<String>(
+                                    medicationPageMedicationsRecord
+                                        .pillBottleWeight,
+                                    'No Weight Recorded',
+                                  ),
+                                  style:
+                                      FlutterFlowTheme.of(context).bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Align(
                               alignment: AlignmentDirectional(0.00, -1.00),
                               child: Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
-                                    56.0, 24.0, 0.0, 8.0),
+                                    0.0, 24.0, 0.0, 8.0),
                                 child: Text(
                                   'Medication Schedule',
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
                                         fontFamily: 'Readex Pro',
-                                        fontSize: 24.0,
+                                        fontSize: 20.0,
                                       ),
                                 ),
                               ),
                             ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 8.0, 16.0, 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: Builder(
+                                builder: (context) {
+                                  final times = medicationPageMedicationsRecord
+                                      .whenToTake
+                                      .toList();
+                                  return ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.vertical,
+                                    itemCount: times.length,
+                                    itemBuilder: (context, timesIndex) {
+                                      final timesItem = times[timesIndex];
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Text(
+                                                  '${formatNumber(
+                                                    timesItem.hour,
+                                                    formatType:
+                                                        FormatType.custom,
+                                                    format: '#0',
+                                                    locale: '',
+                                                  )}:${timesItem.minute.toString()}${timesItem.isAM == true ? 'AM' : 'PM'}',
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Text(
+                                                  timesItem.daysOfTheWeek.length
+                                                      .toString(),
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Monday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            dateTimeFormat(
-                                                'jm',
-                                                medicationPageMedicationsRecord
-                                                    .whenToTake.first),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Tuesday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            medicationPageMedicationsRecord
-                                                .whenToTake.first
-                                                .toString(),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Wednesday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            widget.medicationName!,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Thursday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            widget.medicationName!,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Friday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            valueOrDefault<String>(
-                                              widget.medicationName,
-                                              'blah',
-                                            ),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Saturday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            widget.medicationName!,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Container(
-                            width: 390.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF1F4F8),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 0.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 0.0, 0.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          'Sunday:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                fontSize: 18.0,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 8.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 0.0, 0.0),
-                                          child: Text(
-                                            widget.medicationName!,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  fontSize: 18.0,
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -853,8 +498,12 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                                 alignment: AlignmentDirectional(0.00, -1.00),
                                 child: Text(
                                   'Pedestal ',
-                                  style:
-                                      FlutterFlowTheme.of(context).titleLarge,
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyLarge
+                                      .override(
+                                        fontFamily: 'Readex Pro',
+                                        fontSize: 20.0,
+                                      ),
                                 ),
                               ),
                             ),
@@ -868,12 +517,16 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text(
-                                'Pedestal ID: ${valueOrDefault<String>(
-                                  medicationPageMedicationsRecord.pedestalID,
-                                  'No Pedestal Connected Yet',
-                                )}',
-                                style: FlutterFlowTheme.of(context).bodyMedium,
+                              Flexible(
+                                child: Text(
+                                  'Pedestal ID: ${valueOrDefault<String>(
+                                    medicationPageMedicationsRecord
+                                        .pedestalInfo.id,
+                                    'No Pedestal Connected',
+                                  )}',
+                                  style:
+                                      FlutterFlowTheme.of(context).bodyMedium,
+                                ),
                               ),
                             ],
                           ),
@@ -886,100 +539,149 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (medicationPageMedicationsRecord.pedestalID !=
-                                    null &&
-                                medicationPageMedicationsRecord.pedestalID !=
-                                    '')
-                              Flexible(
-                                child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      8.0, 8.0, 8.0, 8.0),
-                                  child: FFButtonWidget(
-                                    onPressed: () async {
-                                      context.pushNamed(
-                                        'ConnectPage',
-                                        queryParameters: {
-                                          'medID': serializeParam(
-                                            medicationPageMedicationsRecord
-                                                .reference,
-                                            ParamType.DocumentReference,
-                                          ),
-                                        }.withoutNulls,
-                                      );
-                                    },
-                                    text: 'Pedestal Settings',
-                                    options: FFButtonOptions(
-                                      height: 44.0,
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          16.0, 16.0, 16.0, 16.0),
-                                      iconPadding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 0.0, 0.0, 0.0),
-                                      color: Color(0xFFF5ABCF),
-                                      textStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .override(
-                                            fontFamily: 'Readex Pro',
-                                            color: Colors.white,
-                                            fontSize: 14.0,
-                                          ),
-                                      elevation: 3.0,
-                                      borderSide: BorderSide(
-                                        color: Colors.transparent,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
+                            Flexible(
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    16.0, 16.0, 16.0, 16.0),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    context.pushNamed(
+                                      'PedestalSettingsPage',
+                                      queryParameters: {
+                                        'medID': serializeParam(
+                                          widget.medID,
+                                          ParamType.DocumentReference,
+                                        ),
+                                      }.withoutNulls,
+                                    );
+                                  },
+                                  text: 'Pedestal Settings',
+                                  options: FFButtonOptions(
+                                    height: 44.0,
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        16.0, 16.0, 16.0, 16.0),
+                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    color: Color(0xFFF5ABCF),
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
+                                          fontSize: 14.0,
+                                        ),
+                                    elevation: 3.0,
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1.0,
                                     ),
+                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
                                 ),
                               ),
-                            if (medicationPageMedicationsRecord.pedestalID ==
-                                    null ||
-                                medicationPageMedicationsRecord.pedestalID ==
-                                    '')
-                              Flexible(
-                                child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      8.0, 8.0, 8.0, 8.0),
-                                  child: FFButtonWidget(
-                                    onPressed: () async {
-                                      context.pushNamed(
-                                        'ConnectPage',
-                                        queryParameters: {
-                                          'medID': serializeParam(
-                                            medicationPageMedicationsRecord
-                                                .reference,
-                                            ParamType.DocumentReference,
-                                          ),
-                                        }.withoutNulls,
-                                      );
-                                    },
-                                    text: 'Finish Set Up',
-                                    options: FFButtonOptions(
-                                      height: 44.0,
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          16.0, 16.0, 16.0, 16.0),
-                                      iconPadding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 0.0, 0.0, 0.0),
-                                      color: Color(0xFFF5ABCF),
-                                      textStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .override(
-                                            fontFamily: 'Readex Pro',
-                                            color: Colors.white,
-                                            fontSize: 14.0,
-                                          ),
-                                      elevation: 3.0,
-                                      borderSide: BorderSide(
-                                        color: Colors.transparent,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            8.0, 16.0, 8.0, 16.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FFButtonWidget(
+                              onPressed: () async {
+                                context.pushNamed(
+                                  'EditMedPage',
+                                  queryParameters: {
+                                    'medID': serializeParam(
+                                      medicationPageMedicationsRecord.reference,
+                                      ParamType.DocumentReference,
                                     ),
-                                  ),
+                                  }.withoutNulls,
+                                );
+                              },
+                              text: 'Edit Medication',
+                              options: FFButtonOptions(
+                                height: 40.0,
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    24.0, 0.0, 24.0, 0.0),
+                                iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 0.0),
+                                color: Color(0xFFF5ABCF),
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: Colors.white,
+                                    ),
+                                elevation: 3.0,
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1.0,
                                 ),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 16.0, 16.0, 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FFButtonWidget(
+                              onPressed: () async {
+                                await currentUserReference!.update({
+                                  ...mapToFirestore(
+                                    {
+                                      'medications': FieldValue.arrayRemove([
+                                        getMedInfoFirestoreData(
+                                          updateMedInfoStruct(
+                                            MedInfoStruct(
+                                              medicationName:
+                                                  medicationPageMedicationsRecord
+                                                      .medicationName,
+                                              medID: widget.medID,
+                                            ),
+                                            clearUnsetFields: false,
+                                          ),
+                                          true,
+                                        )
+                                      ]),
+                                    },
+                                  ),
+                                });
+                                await widget.medID!.delete();
+
+                                context.pushNamed('HomePage');
+                              },
+                              text: 'Delete Medication',
+                              options: FFButtonOptions(
+                                height: 40.0,
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    24.0, 0.0, 24.0, 0.0),
+                                iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 0.0),
+                                color: FlutterFlowTheme.of(context).error,
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: Colors.white,
+                                    ),
+                                elevation: 3.0,
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
                           ],
                         ),
                       ),

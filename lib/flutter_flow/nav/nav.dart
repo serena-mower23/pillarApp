@@ -123,17 +123,6 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => AddMedPageWidget(),
         ),
         FFRoute(
-          name: 'PedestalPage',
-          path: '/pedestalPage',
-          builder: (context, params) => PedestalPageWidget(
-            deviceName: params.getParam('deviceName', ParamType.String),
-            deviceId: params.getParam('deviceId', ParamType.String),
-            deviceRssi: params.getParam('deviceRssi', ParamType.int),
-            medID: params.getParam('medID', ParamType.DocumentReference, false,
-                ['users', 'medications']),
-          ),
-        ),
-        FFRoute(
           name: 'SettingsPage',
           path: '/settingsPage',
           builder: (context, params) => SettingsPageWidget(),
@@ -147,9 +136,20 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           ),
         ),
         FFRoute(
-          name: 'EditMedicationPage',
-          path: '/editMedicationPage',
-          builder: (context, params) => EditMedicationPageWidget(),
+          name: 'PedestalSettingsPage',
+          path: '/pedestalSettingsPage',
+          builder: (context, params) => PedestalSettingsPageWidget(
+            medID: params.getParam('medID', ParamType.DocumentReference, false,
+                ['users', 'medications']),
+          ),
+        ),
+        FFRoute(
+          name: 'EditMedPage',
+          path: '/editMedPage',
+          builder: (context, params) => EditMedPageWidget(
+            medID: params.getParam('medID', ParamType.DocumentReference, false,
+                ['users', 'medications']),
+          ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

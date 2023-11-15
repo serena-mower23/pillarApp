@@ -20,6 +20,7 @@ class MedicationStruct extends FFFirebaseStruct {
     DateTime? whenToTake,
     DocumentReference? userID,
     String? medID,
+    BTDeviceStruct? pedestalInfo,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _medicationName = medicationName,
         _dosageAmount = dosageAmount,
@@ -31,6 +32,7 @@ class MedicationStruct extends FFFirebaseStruct {
         _whenToTake = whenToTake,
         _userID = userID,
         _medID = medID,
+        _pedestalInfo = pedestalInfo,
         super(firestoreUtilData);
 
   // "medication_name" field.
@@ -94,6 +96,14 @@ class MedicationStruct extends FFFirebaseStruct {
   set medID(String? val) => _medID = val;
   bool hasMedID() => _medID != null;
 
+  // "pedestalInfo" field.
+  BTDeviceStruct? _pedestalInfo;
+  BTDeviceStruct get pedestalInfo => _pedestalInfo ?? BTDeviceStruct();
+  set pedestalInfo(BTDeviceStruct? val) => _pedestalInfo = val;
+  void updatePedestalInfo(Function(BTDeviceStruct) updateFn) =>
+      updateFn(_pedestalInfo ??= BTDeviceStruct());
+  bool hasPedestalInfo() => _pedestalInfo != null;
+
   static MedicationStruct fromMap(Map<String, dynamic> data) =>
       MedicationStruct(
         medicationName: data['medication_name'] as String?,
@@ -106,6 +116,7 @@ class MedicationStruct extends FFFirebaseStruct {
         whenToTake: data['when_to_take'] as DateTime?,
         userID: data['userID'] as DocumentReference?,
         medID: data['medID'] as String?,
+        pedestalInfo: BTDeviceStruct.maybeFromMap(data['pedestalInfo']),
       );
 
   static MedicationStruct? maybeFromMap(dynamic data) =>
@@ -122,6 +133,7 @@ class MedicationStruct extends FFFirebaseStruct {
         'when_to_take': _whenToTake,
         'userID': _userID,
         'medID': _medID,
+        'pedestalInfo': _pedestalInfo?.toMap(),
       }.withoutNulls;
 
   @override
@@ -165,6 +177,10 @@ class MedicationStruct extends FFFirebaseStruct {
         'medID': serializeParam(
           _medID,
           ParamType.String,
+        ),
+        'pedestalInfo': serializeParam(
+          _pedestalInfo,
+          ParamType.DataStruct,
         ),
       }.withoutNulls;
 
@@ -221,6 +237,12 @@ class MedicationStruct extends FFFirebaseStruct {
           ParamType.String,
           false,
         ),
+        pedestalInfo: deserializeStructParam(
+          data['pedestalInfo'],
+          ParamType.DataStruct,
+          false,
+          structBuilder: BTDeviceStruct.fromSerializableMap,
+        ),
       );
 
   @override
@@ -238,7 +260,8 @@ class MedicationStruct extends FFFirebaseStruct {
         pillWeight == other.pillWeight &&
         whenToTake == other.whenToTake &&
         userID == other.userID &&
-        medID == other.medID;
+        medID == other.medID &&
+        pedestalInfo == other.pedestalInfo;
   }
 
   @override
@@ -252,7 +275,8 @@ class MedicationStruct extends FFFirebaseStruct {
         pillWeight,
         whenToTake,
         userID,
-        medID
+        medID,
+        pedestalInfo
       ]);
 }
 
@@ -267,6 +291,7 @@ MedicationStruct createMedicationStruct({
   DateTime? whenToTake,
   DocumentReference? userID,
   String? medID,
+  BTDeviceStruct? pedestalInfo,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
@@ -283,6 +308,8 @@ MedicationStruct createMedicationStruct({
       whenToTake: whenToTake,
       userID: userID,
       medID: medID,
+      pedestalInfo:
+          pedestalInfo ?? (clearUnsetFields ? BTDeviceStruct() : null),
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,
@@ -337,6 +364,14 @@ Map<String, dynamic> getMedicationFirestoreData(
     return {};
   }
   final firestoreData = mapToFirestore(medication.toMap());
+
+  // Handle nested data for "pedestalInfo" field.
+  addBTDeviceStructData(
+    firestoreData,
+    medication.hasPedestalInfo() ? medication.pedestalInfo : null,
+    'pedestalInfo',
+    forFieldValue,
+  );
 
   // Add any Firestore field values
   medication.firestoreUtilData.fieldValues

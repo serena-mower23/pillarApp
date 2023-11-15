@@ -408,6 +408,36 @@ class _NewAccountPageWidgetState extends State<NewAccountPageWidget> {
                                 ),
                               ),
                             ),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Already have an account?  ',
+                                  textAlign: TextAlign.center,
+                                  style:
+                                      FlutterFlowTheme.of(context).bodyMedium,
+                                ),
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    context.pushNamed('LoginPage');
+                                  },
+                                  child: Text(
+                                    'Login here!',
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Color(0xFFF5ABCF),
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),

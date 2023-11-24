@@ -5,8 +5,8 @@ import '../base_auth_user_provider.dart';
 
 export '../base_auth_user_provider.dart';
 
-class PillarApp2FirebaseUser extends BaseAuthUser {
-  PillarApp2FirebaseUser(this.user);
+class PillarAppFirebaseUser extends BaseAuthUser {
+  PillarAppFirebaseUser(this.user);
   User? user;
   bool get loggedIn => user != null;
 
@@ -54,17 +54,17 @@ class PillarApp2FirebaseUser extends BaseAuthUser {
   static BaseAuthUser fromUserCredential(UserCredential userCredential) =>
       fromFirebaseUser(userCredential.user);
   static BaseAuthUser fromFirebaseUser(User? user) =>
-      PillarApp2FirebaseUser(user);
+      PillarAppFirebaseUser(user);
 }
 
-Stream<BaseAuthUser> pillarApp2FirebaseUserStream() => FirebaseAuth.instance
+Stream<BaseAuthUser> pillarAppFirebaseUserStream() => FirebaseAuth.instance
         .authStateChanges()
         .debounce((user) => user == null && !loggedIn
             ? TimerStream(true, const Duration(seconds: 1))
             : Stream.value(user))
         .map<BaseAuthUser>(
       (user) {
-        currentUser = PillarApp2FirebaseUser(user);
+        currentUser = PillarAppFirebaseUser(user);
         return currentUser!;
       },
     );

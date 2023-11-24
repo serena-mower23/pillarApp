@@ -8,20 +8,19 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-Future<MedInfoStruct?> getMedicationInfo(
-  List<MedInfoStruct> medList,
-  String medName,
-) async {
+Future<double> totalAdherence(MedInfoStruct medInfo) async {
   // Add your function code here!
 
-  MedInfoStruct? medInfo = null;
+  List<MedTimeStruct> medTimes = medInfo.whenToTake;
+  int adherence = 0;
+  int occurrences = 0;
 
-  for (MedInfoStruct listItem in medList) {
-    if (listItem.medicationName == medName) {
-      medInfo = listItem;
-      break;
-    }
+  for (MedTimeStruct medTime in medTimes) {
+    adherence += medTime.adherence;
+    occurrences += medTime.occurrences;
   }
 
-  return medInfo;
+  double percentageAdherence = (adherence / occurrences) * 100;
+
+  return percentageAdherence;
 }

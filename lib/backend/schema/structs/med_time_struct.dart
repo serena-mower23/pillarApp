@@ -10,104 +10,215 @@ import '/flutter_flow/flutter_flow_util.dart';
 
 class MedTimeStruct extends FFFirebaseStruct {
   MedTimeStruct({
-    int? hour,
-    int? minute,
-    bool? isAM,
-    List<String>? daysOfTheWeek,
+    bool? monday,
+    bool? tuesday,
+    bool? wednesday,
+    bool? thursday,
+    bool? friday,
+    bool? saturday,
+    bool? sunday,
+    DateTime? time,
+    int? adherence,
+    int? occurrences,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
-  })  : _hour = hour,
-        _minute = minute,
-        _isAM = isAM,
-        _daysOfTheWeek = daysOfTheWeek,
+  })  : _monday = monday,
+        _tuesday = tuesday,
+        _wednesday = wednesday,
+        _thursday = thursday,
+        _friday = friday,
+        _saturday = saturday,
+        _sunday = sunday,
+        _time = time,
+        _adherence = adherence,
+        _occurrences = occurrences,
         super(firestoreUtilData);
 
-  // "hour" field.
-  int? _hour;
-  int get hour => _hour ?? 0;
-  set hour(int? val) => _hour = val;
-  void incrementHour(int amount) => _hour = hour + amount;
-  bool hasHour() => _hour != null;
+  // "monday" field.
+  bool? _monday;
+  bool get monday => _monday ?? false;
+  set monday(bool? val) => _monday = val;
+  bool hasMonday() => _monday != null;
 
-  // "minute" field.
-  int? _minute;
-  int get minute => _minute ?? 0;
-  set minute(int? val) => _minute = val;
-  void incrementMinute(int amount) => _minute = minute + amount;
-  bool hasMinute() => _minute != null;
+  // "tuesday" field.
+  bool? _tuesday;
+  bool get tuesday => _tuesday ?? false;
+  set tuesday(bool? val) => _tuesday = val;
+  bool hasTuesday() => _tuesday != null;
 
-  // "isAM" field.
-  bool? _isAM;
-  bool get isAM => _isAM ?? false;
-  set isAM(bool? val) => _isAM = val;
-  bool hasIsAM() => _isAM != null;
+  // "wednesday" field.
+  bool? _wednesday;
+  bool get wednesday => _wednesday ?? false;
+  set wednesday(bool? val) => _wednesday = val;
+  bool hasWednesday() => _wednesday != null;
 
-  // "days_of_the_week" field.
-  List<String>? _daysOfTheWeek;
-  List<String> get daysOfTheWeek => _daysOfTheWeek ?? const [];
-  set daysOfTheWeek(List<String>? val) => _daysOfTheWeek = val;
-  void updateDaysOfTheWeek(Function(List<String>) updateFn) =>
-      updateFn(_daysOfTheWeek ??= []);
-  bool hasDaysOfTheWeek() => _daysOfTheWeek != null;
+  // "thursday" field.
+  bool? _thursday;
+  bool get thursday => _thursday ?? false;
+  set thursday(bool? val) => _thursday = val;
+  bool hasThursday() => _thursday != null;
+
+  // "friday" field.
+  bool? _friday;
+  bool get friday => _friday ?? false;
+  set friday(bool? val) => _friday = val;
+  bool hasFriday() => _friday != null;
+
+  // "saturday" field.
+  bool? _saturday;
+  bool get saturday => _saturday ?? false;
+  set saturday(bool? val) => _saturday = val;
+  bool hasSaturday() => _saturday != null;
+
+  // "sunday" field.
+  bool? _sunday;
+  bool get sunday => _sunday ?? false;
+  set sunday(bool? val) => _sunday = val;
+  bool hasSunday() => _sunday != null;
+
+  // "time" field.
+  DateTime? _time;
+  DateTime? get time => _time;
+  set time(DateTime? val) => _time = val;
+  bool hasTime() => _time != null;
+
+  // "adherence" field.
+  int? _adherence;
+  int get adherence => _adherence ?? 0;
+  set adherence(int? val) => _adherence = val;
+  void incrementAdherence(int amount) => _adherence = adherence + amount;
+  bool hasAdherence() => _adherence != null;
+
+  // "occurrences" field.
+  int? _occurrences;
+  int get occurrences => _occurrences ?? 0;
+  set occurrences(int? val) => _occurrences = val;
+  void incrementOccurrences(int amount) => _occurrences = occurrences + amount;
+  bool hasOccurrences() => _occurrences != null;
 
   static MedTimeStruct fromMap(Map<String, dynamic> data) => MedTimeStruct(
-        hour: castToType<int>(data['hour']),
-        minute: castToType<int>(data['minute']),
-        isAM: data['isAM'] as bool?,
-        daysOfTheWeek: getDataList(data['days_of_the_week']),
+        monday: data['monday'] as bool?,
+        tuesday: data['tuesday'] as bool?,
+        wednesday: data['wednesday'] as bool?,
+        thursday: data['thursday'] as bool?,
+        friday: data['friday'] as bool?,
+        saturday: data['saturday'] as bool?,
+        sunday: data['sunday'] as bool?,
+        time: data['time'] as DateTime?,
+        adherence: castToType<int>(data['adherence']),
+        occurrences: castToType<int>(data['occurrences']),
       );
 
   static MedTimeStruct? maybeFromMap(dynamic data) =>
       data is Map<String, dynamic> ? MedTimeStruct.fromMap(data) : null;
 
   Map<String, dynamic> toMap() => {
-        'hour': _hour,
-        'minute': _minute,
-        'isAM': _isAM,
-        'days_of_the_week': _daysOfTheWeek,
+        'monday': _monday,
+        'tuesday': _tuesday,
+        'wednesday': _wednesday,
+        'thursday': _thursday,
+        'friday': _friday,
+        'saturday': _saturday,
+        'sunday': _sunday,
+        'time': _time,
+        'adherence': _adherence,
+        'occurrences': _occurrences,
       }.withoutNulls;
 
   @override
   Map<String, dynamic> toSerializableMap() => {
-        'hour': serializeParam(
-          _hour,
-          ParamType.int,
-        ),
-        'minute': serializeParam(
-          _minute,
-          ParamType.int,
-        ),
-        'isAM': serializeParam(
-          _isAM,
+        'monday': serializeParam(
+          _monday,
           ParamType.bool,
         ),
-        'days_of_the_week': serializeParam(
-          _daysOfTheWeek,
-          ParamType.String,
-          true,
+        'tuesday': serializeParam(
+          _tuesday,
+          ParamType.bool,
+        ),
+        'wednesday': serializeParam(
+          _wednesday,
+          ParamType.bool,
+        ),
+        'thursday': serializeParam(
+          _thursday,
+          ParamType.bool,
+        ),
+        'friday': serializeParam(
+          _friday,
+          ParamType.bool,
+        ),
+        'saturday': serializeParam(
+          _saturday,
+          ParamType.bool,
+        ),
+        'sunday': serializeParam(
+          _sunday,
+          ParamType.bool,
+        ),
+        'time': serializeParam(
+          _time,
+          ParamType.DateTime,
+        ),
+        'adherence': serializeParam(
+          _adherence,
+          ParamType.int,
+        ),
+        'occurrences': serializeParam(
+          _occurrences,
+          ParamType.int,
         ),
       }.withoutNulls;
 
   static MedTimeStruct fromSerializableMap(Map<String, dynamic> data) =>
       MedTimeStruct(
-        hour: deserializeParam(
-          data['hour'],
-          ParamType.int,
-          false,
-        ),
-        minute: deserializeParam(
-          data['minute'],
-          ParamType.int,
-          false,
-        ),
-        isAM: deserializeParam(
-          data['isAM'],
+        monday: deserializeParam(
+          data['monday'],
           ParamType.bool,
           false,
         ),
-        daysOfTheWeek: deserializeParam<String>(
-          data['days_of_the_week'],
-          ParamType.String,
-          true,
+        tuesday: deserializeParam(
+          data['tuesday'],
+          ParamType.bool,
+          false,
+        ),
+        wednesday: deserializeParam(
+          data['wednesday'],
+          ParamType.bool,
+          false,
+        ),
+        thursday: deserializeParam(
+          data['thursday'],
+          ParamType.bool,
+          false,
+        ),
+        friday: deserializeParam(
+          data['friday'],
+          ParamType.bool,
+          false,
+        ),
+        saturday: deserializeParam(
+          data['saturday'],
+          ParamType.bool,
+          false,
+        ),
+        sunday: deserializeParam(
+          data['sunday'],
+          ParamType.bool,
+          false,
+        ),
+        time: deserializeParam(
+          data['time'],
+          ParamType.DateTime,
+          false,
+        ),
+        adherence: deserializeParam(
+          data['adherence'],
+          ParamType.int,
+          false,
+        ),
+        occurrences: deserializeParam(
+          data['occurrences'],
+          ParamType.int,
+          false,
         ),
       );
 
@@ -116,32 +227,61 @@ class MedTimeStruct extends FFFirebaseStruct {
 
   @override
   bool operator ==(Object other) {
-    const listEquality = ListEquality();
     return other is MedTimeStruct &&
-        hour == other.hour &&
-        minute == other.minute &&
-        isAM == other.isAM &&
-        listEquality.equals(daysOfTheWeek, other.daysOfTheWeek);
+        monday == other.monday &&
+        tuesday == other.tuesday &&
+        wednesday == other.wednesday &&
+        thursday == other.thursday &&
+        friday == other.friday &&
+        saturday == other.saturday &&
+        sunday == other.sunday &&
+        time == other.time &&
+        adherence == other.adherence &&
+        occurrences == other.occurrences;
   }
 
   @override
-  int get hashCode =>
-      const ListEquality().hash([hour, minute, isAM, daysOfTheWeek]);
+  int get hashCode => const ListEquality().hash([
+        monday,
+        tuesday,
+        wednesday,
+        thursday,
+        friday,
+        saturday,
+        sunday,
+        time,
+        adherence,
+        occurrences
+      ]);
 }
 
 MedTimeStruct createMedTimeStruct({
-  int? hour,
-  int? minute,
-  bool? isAM,
+  bool? monday,
+  bool? tuesday,
+  bool? wednesday,
+  bool? thursday,
+  bool? friday,
+  bool? saturday,
+  bool? sunday,
+  DateTime? time,
+  int? adherence,
+  int? occurrences,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
   bool delete = false,
 }) =>
     MedTimeStruct(
-      hour: hour,
-      minute: minute,
-      isAM: isAM,
+      monday: monday,
+      tuesday: tuesday,
+      wednesday: wednesday,
+      thursday: thursday,
+      friday: friday,
+      saturday: saturday,
+      sunday: sunday,
+      time: time,
+      adherence: adherence,
+      occurrences: occurrences,
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,

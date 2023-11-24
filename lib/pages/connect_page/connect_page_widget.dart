@@ -1,6 +1,6 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/components/empty_pedestal_list_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -16,10 +16,12 @@ export 'connect_page_model.dart';
 class ConnectPageWidget extends StatefulWidget {
   const ConnectPageWidget({
     Key? key,
-    required this.medID,
+    required this.isBluetoothEnabled,
+    required this.medName,
   }) : super(key: key);
 
-  final DocumentReference? medID;
+  final bool? isBluetoothEnabled;
+  final String? medName;
 
   @override
   _ConnectPageWidgetState createState() => _ConnectPageWidgetState();
@@ -70,42 +72,28 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
-              setState(() {
-                _model.isBluetoothEnabled = _model.isBluetoothEnabled;
-              });
-              setState(() {
-                _model.isFetchingDevices = true;
-                _model.isFetchingConnectedDevices = true;
-              });
-              _model.fetchedConnectedDevices =
-                  await actions.getConnectedDevices();
-              setState(() {
-                _model.isFetchingConnectedDevices = false;
-                _model.connectedDevices = _model.fetchedConnectedDevices!
-                    .toList()
-                    .cast<BTDeviceStruct>();
-              });
-              _model.devicesFound = await actions.findDevices();
-              setState(() {
-                _model.isFetchingDevices = false;
-                _model.foundDevices =
-                    _model.devicesFound!.toList().cast<BTDeviceStruct>();
-              });
-
-              setState(() {});
+              context.pushNamed(
+                'MedicationPage',
+                queryParameters: {
+                  'medicationName': serializeParam(
+                    widget.medName,
+                    ParamType.String,
+                  ),
+                }.withoutNulls,
+              );
             },
             child: Icon(
-              Icons.refresh,
-              color: Color(0xFFF1F4F8),
+              Icons.arrow_back_ios,
+              color: Colors.white,
               size: 24.0,
             ),
           ),
           title: Align(
-            alignment: AlignmentDirectional(-1.00, -1.00),
+            alignment: AlignmentDirectional(0.00, -1.00),
             child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(40.0, 0.0, 0.0, 0.0),
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 16.0, 0.0),
               child: Text(
-                'Connect Pedestal',
+                'Pillar',
                 style: FlutterFlowTheme.of(context).headlineMedium.override(
                       fontFamily: 'Outfit',
                       color: Colors.white,
@@ -114,7 +102,47 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
               ),
             ),
           ),
-          actions: [],
+          actions: [
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 16.0, 0.0),
+              child: InkWell(
+                splashColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: () async {
+                  setState(() {
+                    _model.isBluetoothEnabled = _model.isBluetoothEnabled;
+                  });
+                  setState(() {
+                    _model.isFetchingDevices = true;
+                    _model.isFetchingConnectedDevices = true;
+                  });
+                  _model.fetchedConnecetedDevices =
+                      await actions.getConnectedDevices();
+                  setState(() {
+                    _model.isFetchingConnectedDevices = false;
+                    _model.connectedDevices = _model.fetchedConnecetedDevices!
+                        .toList()
+                        .cast<BTDeviceStruct>();
+                  });
+                  _model.devicesFound = await actions.findDevices();
+                  setState(() {
+                    _model.isFetchingDevices = false;
+                    _model.foundDevices =
+                        _model.devicesFound!.toList().cast<BTDeviceStruct>();
+                  });
+
+                  setState(() {});
+                },
+                child: Icon(
+                  Icons.refresh_sharp,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+            ),
+          ],
           centerTitle: false,
           elevation: 2.0,
         ),
@@ -124,112 +152,157 @@ class _ConnectPageWidgetState extends State<ConnectPageWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
-                      child: Text(
-                        'Available Pedestals',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Readex Pro',
-                              fontSize: 28.0,
-                            ),
-                      ),
-                    ),
-                    Container(
-                      width: 391.0,
-                      decoration: BoxDecoration(),
-                      child: Column(
+                SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
                           Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 20.0, 0.0, 0.0),
-                            child: Builder(
-                              builder: (context) {
-                                final displayAvailableDevices =
-                                    _model.devicesFound!.toList();
-                                return ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: displayAvailableDevices.length,
-                                  itemBuilder:
-                                      (context, displayAvailableDevicesIndex) {
-                                    final displayAvailableDevicesItem =
-                                        displayAvailableDevices[
-                                            displayAvailableDevicesIndex];
-                                    return InkWell(
-                                      splashColor: Colors.transparent,
-                                      focusColor: Colors.transparent,
-                                      hoverColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      onTap: () async {
-                                        _model.hasWrite =
-                                            await actions.connectDevice(
-                                          displayAvailableDevicesItem,
+                                0.0, 16.0, 0.0, 0.0),
+                            child: Text(
+                              'Connect to Pedestal',
+                              style: FlutterFlowTheme.of(context).titleLarge,
+                            ),
+                          ),
+                          Container(
+                            width: 391.0,
+                            decoration: BoxDecoration(),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 8.0, 0.0, 0.0),
+                                  child: Builder(
+                                    builder: (context) {
+                                      final availablePedestals =
+                                          _model.foundDevices.toList();
+                                      if (availablePedestals.isEmpty) {
+                                        return Center(
+                                          child: EmptyPedestalListWidget(),
                                         );
-                                        setState(() {
-                                          _model.addToConnectedDevices(
-                                              displayAvailableDevicesItem);
-                                        });
+                                      }
+                                      return ListView.builder(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.vertical,
+                                        itemCount: availablePedestals.length,
+                                        itemBuilder:
+                                            (context, availablePedestalsIndex) {
+                                          final availablePedestalsItem =
+                                              availablePedestals[
+                                                  availablePedestalsIndex];
+                                          return Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    16.0, 8.0, 16.0, 8.0),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Text(
+                                                  'Device Name:  ${availablePedestalsItem.name}',
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyLarge,
+                                                ),
+                                                Flexible(
+                                                  child: Align(
+                                                    alignment:
+                                                        AlignmentDirectional(
+                                                            1.00, 0.00),
+                                                    child: FFButtonWidget(
+                                                      onPressed: () async {
+                                                        _model.hasWrite =
+                                                            await actions
+                                                                .connectDevice(
+                                                          availablePedestalsItem,
+                                                        );
 
-                                        await widget.medID!
-                                            .update(createMedicationsRecordData(
-                                          pedestalInfo: createBTDeviceStruct(
-                                            name: displayAvailableDevicesItem
-                                                .name,
-                                            id: displayAvailableDevicesItem.id,
-                                            rssi: displayAvailableDevicesItem
-                                                .rssi,
-                                            clearUnsetFields: false,
-                                          ),
-                                        ));
+                                                        context.pushNamed(
+                                                          'SetUpPillPage',
+                                                          queryParameters: {
+                                                            'medName':
+                                                                serializeParam(
+                                                              widget.medName,
+                                                              ParamType.String,
+                                                            ),
+                                                            'pedestalName':
+                                                                serializeParam(
+                                                              availablePedestalsItem
+                                                                  .name,
+                                                              ParamType.String,
+                                                            ),
+                                                            'pedestalID':
+                                                                serializeParam(
+                                                              availablePedestalsItem
+                                                                  .id,
+                                                              ParamType.String,
+                                                            ),
+                                                          }.withoutNulls,
+                                                        );
 
-                                        context.pushNamed(
-                                          'PedestalSettingsPage',
-                                          queryParameters: {
-                                            'medID': serializeParam(
-                                              widget.medID,
-                                              ParamType.DocumentReference,
+                                                        setState(() {});
+                                                      },
+                                                      text: 'Connect',
+                                                      options: FFButtonOptions(
+                                                        height: 40.0,
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    24.0,
+                                                                    0.0,
+                                                                    24.0,
+                                                                    0.0),
+                                                        iconPadding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0),
+                                                        color:
+                                                            Color(0xFFF5ABCF),
+                                                        textStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .titleSmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                        elevation: 3.0,
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .transparent,
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          }.withoutNulls,
-                                        );
-
-                                        setState(() {});
-                                      },
-                                      child: ListTile(
-                                        title: Text(
-                                          displayAvailableDevicesItem.name,
-                                          style: FlutterFlowTheme.of(context)
-                                              .titleLarge,
-                                        ),
-                                        subtitle: Text(
-                                          displayAvailableDevicesItem.id,
-                                          style: FlutterFlowTheme.of(context)
-                                              .labelMedium,
-                                        ),
-                                        trailing: Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                          size: 20.0,
-                                        ),
-                                        tileColor: Color(0xFFF1F4F8),
-                                        dense: false,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

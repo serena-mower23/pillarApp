@@ -41,11 +41,6 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       setState(() {
         _model.isBluetoothEnabled = widget.isBluetoothEnabled!;
       });
-      setState(() {
-        _model.meds = (currentUserDocument?.medications?.toList() ?? [])
-            .toList()
-            .cast<MedInfoStruct>();
-      });
     });
   }
 
@@ -165,138 +160,143 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
                               0.0, 16.0, 0.0, 0.0),
-                          child: Builder(
-                            builder: (context) {
-                              final medications =
-                                  homePageMedicationsRecordList.toList();
-                              return ListView.builder(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                itemCount: medications.length,
-                                itemBuilder: (context, medicationsIndex) {
-                                  final medicationsItem =
-                                      medications[medicationsIndex];
-                                  return Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 8.0),
-                                    child: Container(
-                                      width: 100.0,
-                                      height: 40.0,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFF1F4F8),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Align(
-                                                alignment: AlignmentDirectional(
-                                                    -1.00, 0.00),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          16.0, 12.0, 8.0, 0.0),
-                                                  child: Text(
-                                                    medicationsItem
-                                                        .medicationName,
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          fontSize: 13.0,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Align(
-                                                alignment: AlignmentDirectional(
-                                                    1.00, 0.00),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 4.0, 16.0, 0.0),
-                                                  child: FFButtonWidget(
-                                                    onPressed: () async {
-                                                      context.pushNamed(
-                                                        'MedicationPage',
-                                                        queryParameters: {
-                                                          'medicationName':
-                                                              serializeParam(
-                                                            medicationsItem
-                                                                .medicationName,
-                                                            ParamType.String,
-                                                          ),
-                                                          'medID':
-                                                              serializeParam(
-                                                            medicationsItem
-                                                                .reference,
-                                                            ParamType
-                                                                .DocumentReference,
-                                                          ),
-                                                        }.withoutNulls,
-                                                      );
-                                                    },
-                                                    text: 'View',
-                                                    options: FFButtonOptions(
-                                                      height: 30.0,
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  8.0,
-                                                                  0.0,
-                                                                  8.0,
-                                                                  0.0),
-                                                      iconPadding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0.0,
-                                                                  0.0,
-                                                                  0.0,
-                                                                  0.0),
-                                                      color: Color(0xFFF5ABCF),
-                                                      textStyle:
+                          child: AuthUserStreamWidget(
+                            builder: (context) => Builder(
+                              builder: (context) {
+                                final medications = (currentUserDocument
+                                            ?.medications
+                                            ?.toList() ??
+                                        [])
+                                    .toList();
+                                return ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: medications.length,
+                                  itemBuilder: (context, medicationsIndex) {
+                                    final medicationsItem =
+                                        medications[medicationsIndex];
+                                    return Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 8.0),
+                                      child: Container(
+                                        width: 100.0,
+                                        height: 40.0,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFFF1F4F8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Align(
+                                                  alignment:
+                                                      AlignmentDirectional(
+                                                          -1.00, 0.00),
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(16.0,
+                                                                12.0, 8.0, 0.0),
+                                                    child: Text(
+                                                      medicationsItem
+                                                          .medicationName,
+                                                      style:
                                                           FlutterFlowTheme.of(
                                                                   context)
-                                                              .titleSmall
+                                                              .bodyMedium
                                                               .override(
                                                                 fontFamily:
                                                                     'Readex Pro',
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 12.0,
+                                                                fontSize: 13.0,
                                                               ),
-                                                      elevation: 3.0,
-                                                      borderSide: BorderSide(
-                                                        color:
-                                                            Colors.transparent,
-                                                        width: 1.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                              ],
+                                            ),
+                                            Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Align(
+                                                  alignment:
+                                                      AlignmentDirectional(
+                                                          1.00, 0.00),
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(0.0, 4.0,
+                                                                16.0, 0.0),
+                                                    child: FFButtonWidget(
+                                                      onPressed: () async {
+                                                        context.pushNamed(
+                                                          'MedicationPage',
+                                                          queryParameters: {
+                                                            'medicationName':
+                                                                serializeParam(
+                                                              medicationsItem
+                                                                  .medicationName,
+                                                              ParamType.String,
+                                                            ),
+                                                          }.withoutNulls,
+                                                        );
+                                                      },
+                                                      text: 'View',
+                                                      options: FFButtonOptions(
+                                                        height: 30.0,
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    8.0,
+                                                                    0.0,
+                                                                    8.0,
+                                                                    0.0),
+                                                        iconPadding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0,
+                                                                    0.0),
+                                                        color:
+                                                            Color(0xFFF5ABCF),
+                                                        textStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .titleSmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize:
+                                                                      12.0,
+                                                                ),
+                                                        elevation: 3.0,
+                                                        borderSide: BorderSide(
+                                                          color: Colors
+                                                              .transparent,
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                         Align(
@@ -307,7 +307,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             child: FFButtonWidget(
                               onPressed: () async {
                                 context.pushNamed(
-                                  'AddMedPage',
+                                  'AddMedInfoPage',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
                                       hasTransition: true,

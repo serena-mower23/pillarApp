@@ -8,9 +8,6 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-
-Future<int> getRssi(BTDeviceStruct deviceInfo) async {
-  final device = BluetoothDevice.fromId(deviceInfo.id);
-  return await device.readRssi();
+Future weeklyAdherence() async {
+  // Add your function code here!
 }

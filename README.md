@@ -1,4 +1,4 @@
-# PillarApp2
+# PillarApp
 
 A new Flutter project.
 

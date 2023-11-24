@@ -8,8 +8,8 @@ import '/backend/schema/util/schema_util.dart';
 import 'index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
-class MedicationsRecord extends FirestoreRecord {
-  MedicationsRecord._(
+class MedsRecord extends FirestoreRecord {
+  MedsRecord._(
     DocumentReference reference,
     Map<String, dynamic> data,
   ) : super(reference, data) {
@@ -46,7 +46,7 @@ class MedicationsRecord extends FirestoreRecord {
   DocumentReference? get userID => _userID;
   bool hasUserID() => _userID != null;
 
-  // "pedestalInfo" field.
+  // "pedestal_info" field.
   BTDeviceStruct? _pedestalInfo;
   BTDeviceStruct get pedestalInfo => _pedestalInfo ?? BTDeviceStruct();
   bool hasPedestalInfo() => _pedestalInfo != null;
@@ -56,22 +56,20 @@ class MedicationsRecord extends FirestoreRecord {
   String get pillWeight => _pillWeight ?? '';
   bool hasPillWeight() => _pillWeight != null;
 
+  // "pill_weight_double" field.
+  double? _pillWeightDouble;
+  double get pillWeightDouble => _pillWeightDouble ?? 0.0;
+  bool hasPillWeightDouble() => _pillWeightDouble != null;
+
   // "pill_bottle_weight" field.
-  String? _pillBottleWeight;
-  String get pillBottleWeight => _pillBottleWeight ?? '';
+  double? _pillBottleWeight;
+  double get pillBottleWeight => _pillBottleWeight ?? 0.0;
   bool hasPillBottleWeight() => _pillBottleWeight != null;
 
   // "when_to_take" field.
-  List<DocumentReference>? _whenToTake;
-  List<DocumentReference> get whenToTake => _whenToTake ?? const [];
+  List<MedTimeStruct>? _whenToTake;
+  List<MedTimeStruct> get whenToTake => _whenToTake ?? const [];
   bool hasWhenToTake() => _whenToTake != null;
-
-  // "when_take" field.
-  List<MedTimeStruct>? _whenTake;
-  List<MedTimeStruct> get whenTake => _whenTake ?? const [];
-  bool hasWhenTake() => _whenTake != null;
-
-  DocumentReference get parentReference => reference.parent.parent!;
 
   void _initializeFields() {
     _medicationName = snapshotData['medication_name'] as String?;
@@ -80,56 +78,50 @@ class MedicationsRecord extends FirestoreRecord {
     _pillDosageCount = castToType<int>(snapshotData['pill_dosage_count']);
     _withFood = snapshotData['with_food'] as bool?;
     _userID = snapshotData['userID'] as DocumentReference?;
-    _pedestalInfo = BTDeviceStruct.maybeFromMap(snapshotData['pedestalInfo']);
+    _pedestalInfo = BTDeviceStruct.maybeFromMap(snapshotData['pedestal_info']);
     _pillWeight = snapshotData['pill_weight'] as String?;
-    _pillBottleWeight = snapshotData['pill_bottle_weight'] as String?;
-    _whenToTake = getDataList(snapshotData['when_to_take']);
-    _whenTake = getStructList(
-      snapshotData['when_take'],
+    _pillWeightDouble = castToType<double>(snapshotData['pill_weight_double']);
+    _pillBottleWeight = castToType<double>(snapshotData['pill_bottle_weight']);
+    _whenToTake = getStructList(
+      snapshotData['when_to_take'],
       MedTimeStruct.fromMap,
     );
   }
 
-  static Query<Map<String, dynamic>> collection([DocumentReference? parent]) =>
-      parent != null
-          ? parent.collection('medications')
-          : FirebaseFirestore.instance.collectionGroup('medications');
+  static CollectionReference get collection =>
+      FirebaseFirestore.instance.collection('meds');
 
-  static DocumentReference createDoc(DocumentReference parent) =>
-      parent.collection('medications').doc();
+  static Stream<MedsRecord> getDocument(DocumentReference ref) =>
+      ref.snapshots().map((s) => MedsRecord.fromSnapshot(s));
 
-  static Stream<MedicationsRecord> getDocument(DocumentReference ref) =>
-      ref.snapshots().map((s) => MedicationsRecord.fromSnapshot(s));
+  static Future<MedsRecord> getDocumentOnce(DocumentReference ref) =>
+      ref.get().then((s) => MedsRecord.fromSnapshot(s));
 
-  static Future<MedicationsRecord> getDocumentOnce(DocumentReference ref) =>
-      ref.get().then((s) => MedicationsRecord.fromSnapshot(s));
-
-  static MedicationsRecord fromSnapshot(DocumentSnapshot snapshot) =>
-      MedicationsRecord._(
+  static MedsRecord fromSnapshot(DocumentSnapshot snapshot) => MedsRecord._(
         snapshot.reference,
         mapFromFirestore(snapshot.data() as Map<String, dynamic>),
       );
 
-  static MedicationsRecord getDocumentFromData(
+  static MedsRecord getDocumentFromData(
     Map<String, dynamic> data,
     DocumentReference reference,
   ) =>
-      MedicationsRecord._(reference, mapFromFirestore(data));
+      MedsRecord._(reference, mapFromFirestore(data));
 
   @override
   String toString() =>
-      'MedicationsRecord(reference: ${reference.path}, data: $snapshotData)';
+      'MedsRecord(reference: ${reference.path}, data: $snapshotData)';
 
   @override
   int get hashCode => reference.path.hashCode;
 
   @override
   bool operator ==(other) =>
-      other is MedicationsRecord &&
+      other is MedsRecord &&
       reference.path.hashCode == other.reference.path.hashCode;
 }
 
-Map<String, dynamic> createMedicationsRecordData({
+Map<String, dynamic> createMedsRecordData({
   String? medicationName,
   int? dosageAmount,
   int? pillCount,
@@ -138,7 +130,8 @@ Map<String, dynamic> createMedicationsRecordData({
   DocumentReference? userID,
   BTDeviceStruct? pedestalInfo,
   String? pillWeight,
-  String? pillBottleWeight,
+  double? pillWeightDouble,
+  double? pillBottleWeight,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -148,23 +141,24 @@ Map<String, dynamic> createMedicationsRecordData({
       'pill_dosage_count': pillDosageCount,
       'with_food': withFood,
       'userID': userID,
-      'pedestalInfo': BTDeviceStruct().toMap(),
+      'pedestal_info': BTDeviceStruct().toMap(),
       'pill_weight': pillWeight,
+      'pill_weight_double': pillWeightDouble,
       'pill_bottle_weight': pillBottleWeight,
     }.withoutNulls,
   );
 
-  // Handle nested data for "pedestalInfo" field.
-  addBTDeviceStructData(firestoreData, pedestalInfo, 'pedestalInfo');
+  // Handle nested data for "pedestal_info" field.
+  addBTDeviceStructData(firestoreData, pedestalInfo, 'pedestal_info');
 
   return firestoreData;
 }
 
-class MedicationsRecordDocumentEquality implements Equality<MedicationsRecord> {
-  const MedicationsRecordDocumentEquality();
+class MedsRecordDocumentEquality implements Equality<MedsRecord> {
+  const MedsRecordDocumentEquality();
 
   @override
-  bool equals(MedicationsRecord? e1, MedicationsRecord? e2) {
+  bool equals(MedsRecord? e1, MedsRecord? e2) {
     const listEquality = ListEquality();
     return e1?.medicationName == e2?.medicationName &&
         e1?.dosageAmount == e2?.dosageAmount &&
@@ -174,13 +168,13 @@ class MedicationsRecordDocumentEquality implements Equality<MedicationsRecord> {
         e1?.userID == e2?.userID &&
         e1?.pedestalInfo == e2?.pedestalInfo &&
         e1?.pillWeight == e2?.pillWeight &&
+        e1?.pillWeightDouble == e2?.pillWeightDouble &&
         e1?.pillBottleWeight == e2?.pillBottleWeight &&
-        listEquality.equals(e1?.whenToTake, e2?.whenToTake) &&
-        listEquality.equals(e1?.whenTake, e2?.whenTake);
+        listEquality.equals(e1?.whenToTake, e2?.whenToTake);
   }
 
   @override
-  int hash(MedicationsRecord? e) => const ListEquality().hash([
+  int hash(MedsRecord? e) => const ListEquality().hash([
         e?.medicationName,
         e?.dosageAmount,
         e?.pillCount,
@@ -189,11 +183,11 @@ class MedicationsRecordDocumentEquality implements Equality<MedicationsRecord> {
         e?.userID,
         e?.pedestalInfo,
         e?.pillWeight,
+        e?.pillWeightDouble,
         e?.pillBottleWeight,
-        e?.whenToTake,
-        e?.whenTake
+        e?.whenToTake
       ]);
 
   @override
-  bool isValidKey(Object? o) => o is MedicationsRecord;
+  bool isValidKey(Object? o) => o is MedsRecord;
 }

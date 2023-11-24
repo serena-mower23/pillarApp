@@ -1,19 +1,16 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
-import '/components/medication_time_picker_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'edit_med_page_widget.dart' show EditMedPageWidget;
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'add_med_info_page_widget.dart' show AddMedInfoPageWidget;
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class EditMedPageModel extends FlutterFlowModel<EditMedPageWidget> {
+class AddMedInfoPageModel extends FlutterFlowModel<AddMedInfoPageWidget> {
   ///  Local state fields for this page.
 
   bool isFetchingDevices = false;
@@ -77,17 +74,12 @@ class EditMedPageModel extends FlutterFlowModel<EditMedPageWidget> {
   FocusNode? pillDosageFieldFocusNode;
   TextEditingController? pillDosageFieldController;
   String? Function(BuildContext, String?)? pillDosageFieldControllerValidator;
-  // State field(s) for WithFoodTile widget.
-  bool? withFoodTileValue;
-  // Model for MedicationTimePicker component.
-  late MedicationTimePickerModel medicationTimePickerModel;
+  // State field(s) for Switch widget.
+  bool? switchValue;
 
   /// Initialization and disposal methods.
 
-  void initState(BuildContext context) {
-    medicationTimePickerModel =
-        createModel(context, () => MedicationTimePickerModel());
-  }
+  void initState(BuildContext context) {}
 
   void dispose() {
     unfocusNode.dispose();
@@ -102,8 +94,6 @@ class EditMedPageModel extends FlutterFlowModel<EditMedPageWidget> {
 
     pillDosageFieldFocusNode?.dispose();
     pillDosageFieldController?.dispose();
-
-    medicationTimePickerModel.dispose();
   }
 
   /// Action blocks are added here.

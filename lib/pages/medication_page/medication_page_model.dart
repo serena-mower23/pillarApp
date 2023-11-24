@@ -1,10 +1,10 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart' as actions;
+import '/flutter_flow/permissions_util.dart';
 import 'medication_page_widget.dart' show MedicationPageWidget;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -34,11 +34,26 @@ class MedicationPageModel extends FlutterFlowModel<MedicationPageWidget> {
 
   DocumentReference? medID;
 
+  MedInfoStruct? medicationInfo;
+  void updateMedicationInfoStruct(Function(MedInfoStruct) updateFn) =>
+      updateFn(medicationInfo ??= MedInfoStruct());
+
+  List<MedInfoStruct> meds = [];
+  void addToMeds(MedInfoStruct item) => meds.add(item);
+  void removeFromMeds(MedInfoStruct item) => meds.remove(item);
+  void removeAtIndexFromMeds(int index) => meds.removeAt(index);
+  void insertAtIndexInMeds(int index, MedInfoStruct item) =>
+      meds.insert(index, item);
+  void updateMedsAtIndex(int index, Function(MedInfoStruct) updateFn) =>
+      meds[index] = updateFn(meds[index]);
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
   // Stores action output result for [Custom Action - getConnectedDevices] action in MedicationPage widget.
   List<BTDeviceStruct>? fetchedConnectedDevices;
+  // Stores action output result for [Custom Action - getMedicationInfo] action in MedicationPage widget.
+  MedInfoStruct? medInfo;
 
   /// Initialization and disposal methods.
 

@@ -1,39 +1,34 @@
 import '/auth/firebase_auth/auth_util.dart';
-import '/backend/backend.dart';
+import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/instant_timer.dart';
+import 'dart:async';
 import '/custom_code/actions/index.dart' as actions;
-import 'pedestal_settings_page_widget.dart' show PedestalSettingsPageWidget;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
+import 'set_up_bottle_page_widget.dart' show SetUpBottlePageWidget;
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class PedestalSettingsPageModel
-    extends FlutterFlowModel<PedestalSettingsPageWidget> {
+class SetUpBottlePageModel extends FlutterFlowModel<SetUpBottlePageWidget> {
   ///  Local state fields for this page.
 
   String receivedValue = '';
-
-  String pillWeight = '';
 
   String bottleWeight = '';
 
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // Stores action output result for [Firestore Query - Query a collection] action in PedestalSettingsPage widget.
-  MedicationsRecord? medInfo;
-  // Stores action output result for [Custom Action - connectDevice] action in PedestalSettingsPage widget.
-  bool? connectedPedestal;
-  InstantTimer? pedestalTimer;
-  // Stores action output result for [Custom Action - receiveData] action in PedestalSettingsPage widget.
-  String? randomReceivedData;
+  // Stores action output result for [Custom Action - connectDevice] action in SetUpBottlePage widget.
+  bool? connectedDevice;
+  InstantTimer? bottleTimer;
+  // Stores action output result for [Custom Action - receiveData] action in Button widget.
+  String? bottleValue;
 
   /// Initialization and disposal methods.
 
@@ -41,7 +36,7 @@ class PedestalSettingsPageModel
 
   void dispose() {
     unfocusNode.dispose();
-    pedestalTimer?.cancel();
+    bottleTimer?.cancel();
   }
 
   /// Action blocks are added here.

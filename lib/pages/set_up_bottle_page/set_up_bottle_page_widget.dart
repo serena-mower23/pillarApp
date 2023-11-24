@@ -1,0 +1,339 @@
+import '/auth/firebase_auth/auth_util.dart';
+import '/backend/schema/structs/index.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/instant_timer.dart';
+import 'dart:async';
+import '/custom_code/actions/index.dart' as actions;
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'set_up_bottle_page_model.dart';
+export 'set_up_bottle_page_model.dart';
+
+class SetUpBottlePageWidget extends StatefulWidget {
+  const SetUpBottlePageWidget({
+    Key? key,
+    required this.pedestalName,
+    required this.pedestalID,
+    required this.pillWeight,
+    required this.medName,
+  }) : super(key: key);
+
+  final String? pedestalName;
+  final String? pedestalID;
+  final String? pillWeight;
+  final String? medName;
+
+  @override
+  _SetUpBottlePageWidgetState createState() => _SetUpBottlePageWidgetState();
+}
+
+class _SetUpBottlePageWidgetState extends State<SetUpBottlePageWidget> {
+  late SetUpBottlePageModel _model;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _model = createModel(context, () => SetUpBottlePageModel());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.connectedDevice = await actions.connectDevice(
+        BTDeviceStruct(
+          name: widget.pedestalName,
+          id: widget.pedestalID,
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        appBar: AppBar(
+          backgroundColor: Color(0xFF549DA8),
+          automaticallyImplyLeading: false,
+          leading: InkWell(
+            splashColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onTap: () async {
+              context.pushNamed(
+                'SetUpPillPage',
+                queryParameters: {
+                  'medName': serializeParam(
+                    widget.medName,
+                    ParamType.String,
+                  ),
+                  'pedestalName': serializeParam(
+                    widget.pedestalName,
+                    ParamType.String,
+                  ),
+                  'pedestalID': serializeParam(
+                    widget.pedestalID,
+                    ParamType.String,
+                  ),
+                }.withoutNulls,
+              );
+            },
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: FlutterFlowTheme.of(context).primaryBackground,
+              size: 24.0,
+            ),
+          ),
+          title: Align(
+            alignment: AlignmentDirectional(0.00, -1.00),
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 48.0, 0.0),
+              child: Text(
+                'Pillar',
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Outfit',
+                      color: Colors.white,
+                      fontSize: 22.0,
+                    ),
+              ),
+            ),
+          ),
+          actions: [],
+          centerTitle: false,
+          elevation: 2.0,
+        ),
+        body: SafeArea(
+          top: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Flexible(
+                      child: Align(
+                        alignment: AlignmentDirectional(0.00, -1.00),
+                        child: Text(
+                          'Weigh Bottle',
+                          style: FlutterFlowTheme.of(context).titleLarge,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Flexible(
+                    child: Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                      child: AutoSizeText(
+                        'To finish setting up your medication, click the button below:',
+                        textAlign: TextAlign.start,
+                        style: FlutterFlowTheme.of(context).bodyMedium,
+                        minFontSize: 11.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Flexible(
+                      child: Align(
+                        alignment: AlignmentDirectional(0.00, -1.00),
+                        child: FFButtonWidget(
+                          onPressed: () async {
+                            unawaited(
+                              () async {
+                                await showDialog(
+                                  context: context,
+                                  builder: (alertDialogContext) {
+                                    return AlertDialog(
+                                      title: Text('Weighing...'),
+                                      content: Text(
+                                          'Look at your pedestal for instructions!'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }(),
+                            );
+                            await actions.sendData(
+                              BTDeviceStruct(
+                                name: widget.pedestalName,
+                                id: widget.pedestalID,
+                              ),
+                              'fullBottle',
+                            );
+                            _model.bottleTimer = InstantTimer.periodic(
+                              duration: Duration(milliseconds: 1000),
+                              callback: (timer) async {
+                                _model.bottleValue = await actions.receiveData(
+                                  BTDeviceStruct(
+                                    name: widget.pedestalName,
+                                    id: widget.pedestalID,
+                                  ),
+                                );
+                                setState(() {
+                                  _model.bottleWeight = _model.bottleValue!;
+                                });
+                                _model.bottleTimer?.cancel();
+                              },
+                              startImmediately: true,
+                            );
+
+                            setState(() {});
+                          },
+                          text: 'Weigh Entire Bottle',
+                          options: FFButtonOptions(
+                            height: 40.0,
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                24.0, 0.0, 24.0, 0.0),
+                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 0.0, 0.0, 0.0),
+                            color: Color(0xFFF5ABCF),
+                            textStyle: FlutterFlowTheme.of(context)
+                                .titleSmall
+                                .override(
+                                  fontFamily: 'Readex Pro',
+                                  color: Colors.white,
+                                ),
+                            elevation: 3.0,
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Bottle Weight: ${_model.bottleWeight != null && _model.bottleWeight != '' ? _model.bottleWeight : 'Weight Not Recorded Yet'}',
+                        style: FlutterFlowTheme.of(context).bodyLarge,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(16.0, 32.0, 16.0, 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: FFButtonWidget(
+                        onPressed: _model.bottleWeight == null ||
+                                _model.bottleWeight == ''
+                            ? null
+                            : () async {
+                                await actions.updateMedInfoAfterSetup(
+                                  currentUserReference!.id,
+                                  widget.medName!,
+                                  BTDeviceStruct(
+                                    name: widget.pedestalName,
+                                    id: widget.pedestalID,
+                                  ),
+                                  widget.pillWeight!,
+                                  _model.bottleWeight,
+                                );
+                                setState(() {
+                                  _model.bottleWeight = '';
+                                });
+
+                                context.pushNamed(
+                                  'MedicationPage',
+                                  queryParameters: {
+                                    'medicationName': serializeParam(
+                                      widget.medName,
+                                      ParamType.String,
+                                    ),
+                                  }.withoutNulls,
+                                );
+                              },
+                        text: 'Finish Setup',
+                        options: FFButtonOptions(
+                          height: 40.0,
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              24.0, 0.0, 24.0, 0.0),
+                          iconPadding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 0.0, 0.0),
+                          color: Color(0xFFF5ABCF),
+                          textStyle:
+                              FlutterFlowTheme.of(context).titleSmall.override(
+                                    fontFamily: 'Readex Pro',
+                                    color: Colors.white,
+                                  ),
+                          elevation: 3.0,
+                          borderSide: BorderSide(
+                            color: Colors.transparent,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
+                          disabledColor: Color(0xFFB2B2B2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

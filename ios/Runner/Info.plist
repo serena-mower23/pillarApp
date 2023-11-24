@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>PillarApp2</string>
+	<string>PillarApp</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>PillarApp2</string>
+	<string>PillarApp</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 
@@ -37,10 +37,10 @@
         <key>CFBundleTypeRole</key>
         <string>Editor</string>
         <key>CFBundleURLName</key>
-        <string>pillarapp2.com</string>
+        <string>pillarapp.com</string>
         <key>CFBundleURLSchemes</key>
         <array>
-        <string>pillarapp2</string>
+        <string>pillarapp</string>
         </array>
         </dict>
     </array>
@@ -58,6 +58,13 @@
     <string>Bluetooth permission is required to connect with a device</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
     <string>Bluetooth permission is required to connect with a device</string>
+	<key>PermissionGroupNotification</key>
+    <string>Push notifications are required to receive reminders about medication. </string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
 
 
 	<key>UILaunchStoryboardName</key>

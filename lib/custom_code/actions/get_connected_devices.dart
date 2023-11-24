@@ -17,11 +17,9 @@ Future<List<BTDeviceStruct>> getConnectedDevices() async {
     final deviceResult = connectedDevices[i];
     final deviceState = await deviceResult.state.first;
     if (deviceState == BluetoothConnectionState.connected) {
-      final deviceRssi = await deviceResult.readRssi();
       devices.add(BTDeviceStruct(
         name: deviceResult.name,
         id: deviceResult.id.toString(),
-        rssi: deviceRssi,
       ));
     }
   }

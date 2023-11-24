@@ -12,11 +12,9 @@ class BTDeviceStruct extends FFFirebaseStruct {
   BTDeviceStruct({
     String? name,
     String? id,
-    int? rssi,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _name = name,
         _id = id,
-        _rssi = rssi,
         super(firestoreUtilData);
 
   // "name" field.
@@ -31,17 +29,9 @@ class BTDeviceStruct extends FFFirebaseStruct {
   set id(String? val) => _id = val;
   bool hasId() => _id != null;
 
-  // "rssi" field.
-  int? _rssi;
-  int get rssi => _rssi ?? 0;
-  set rssi(int? val) => _rssi = val;
-  void incrementRssi(int amount) => _rssi = rssi + amount;
-  bool hasRssi() => _rssi != null;
-
   static BTDeviceStruct fromMap(Map<String, dynamic> data) => BTDeviceStruct(
         name: data['name'] as String?,
         id: data['id'] as String?,
-        rssi: castToType<int>(data['rssi']),
       );
 
   static BTDeviceStruct? maybeFromMap(dynamic data) =>
@@ -50,7 +40,6 @@ class BTDeviceStruct extends FFFirebaseStruct {
   Map<String, dynamic> toMap() => {
         'name': _name,
         'id': _id,
-        'rssi': _rssi,
       }.withoutNulls;
 
   @override
@@ -62,10 +51,6 @@ class BTDeviceStruct extends FFFirebaseStruct {
         'id': serializeParam(
           _id,
           ParamType.String,
-        ),
-        'rssi': serializeParam(
-          _rssi,
-          ParamType.int,
         ),
       }.withoutNulls;
 
@@ -81,11 +66,6 @@ class BTDeviceStruct extends FFFirebaseStruct {
           ParamType.String,
           false,
         ),
-        rssi: deserializeParam(
-          data['rssi'],
-          ParamType.int,
-          false,
-        ),
       );
 
   @override
@@ -93,20 +73,16 @@ class BTDeviceStruct extends FFFirebaseStruct {
 
   @override
   bool operator ==(Object other) {
-    return other is BTDeviceStruct &&
-        name == other.name &&
-        id == other.id &&
-        rssi == other.rssi;
+    return other is BTDeviceStruct && name == other.name && id == other.id;
   }
 
   @override
-  int get hashCode => const ListEquality().hash([name, id, rssi]);
+  int get hashCode => const ListEquality().hash([name, id]);
 }
 
 BTDeviceStruct createBTDeviceStruct({
   String? name,
   String? id,
-  int? rssi,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
@@ -115,7 +91,6 @@ BTDeviceStruct createBTDeviceStruct({
     BTDeviceStruct(
       name: name,
       id: id,
-      rssi: rssi,
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,

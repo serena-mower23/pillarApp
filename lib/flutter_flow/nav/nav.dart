@@ -9,6 +9,8 @@ import '/backend/schema/structs/index.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
+import '/backend/push_notifications/push_notifications_handler.dart'
+    show PushNotificationsHandler;
 import '/index.dart';
 import '/main.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -113,14 +115,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: '/medicationPage',
           builder: (context, params) => MedicationPageWidget(
             medicationName: params.getParam('medicationName', ParamType.String),
-            medID: params.getParam('medID', ParamType.DocumentReference, false,
-                ['users', 'medications']),
           ),
         ),
         FFRoute(
-          name: 'AddMedPage',
-          path: '/addMedPage',
-          builder: (context, params) => AddMedPageWidget(),
+          name: 'AddMedInfoPage',
+          path: '/addMedInfoPage',
+          builder: (context, params) => AddMedInfoPageWidget(),
         ),
         FFRoute(
           name: 'SettingsPage',
@@ -128,28 +128,55 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => SettingsPageWidget(),
         ),
         FFRoute(
-          name: 'ConnectPage',
-          path: '/connectPage',
-          builder: (context, params) => ConnectPageWidget(
-            medID: params.getParam('medID', ParamType.DocumentReference, false,
-                ['users', 'medications']),
-          ),
-        ),
-        FFRoute(
           name: 'PedestalSettingsPage',
           path: '/pedestalSettingsPage',
           builder: (context, params) => PedestalSettingsPageWidget(
-            medID: params.getParam('medID', ParamType.DocumentReference, false,
-                ['users', 'medications']),
+            medName: params.getParam('medName', ParamType.String),
           ),
         ),
         FFRoute(
-          name: 'EditMedPage',
-          path: '/editMedPage',
-          builder: (context, params) => EditMedPageWidget(
-            medID: params.getParam('medID', ParamType.DocumentReference, false,
-                ['users', 'medications']),
+          name: 'AddMedTimesPage',
+          path: '/addMedTimesPage',
+          builder: (context, params) => AddMedTimesPageWidget(
+            medName: params.getParam('medName', ParamType.String),
+            medDosage: params.getParam('medDosage', ParamType.int),
+            pillCount: params.getParam('pillCount', ParamType.int),
+            withFood: params.getParam('withFood', ParamType.bool),
+            pillDosage: params.getParam('pillDosage', ParamType.int),
           ),
+        ),
+        FFRoute(
+          name: 'ConnectPage',
+          path: '/connectPage',
+          builder: (context, params) => ConnectPageWidget(
+            isBluetoothEnabled:
+                params.getParam('isBluetoothEnabled', ParamType.bool),
+            medName: params.getParam('medName', ParamType.String),
+          ),
+        ),
+        FFRoute(
+          name: 'SetUpPillPage',
+          path: '/setUpPillPage',
+          builder: (context, params) => SetUpPillPageWidget(
+            pedestalName: params.getParam('pedestalName', ParamType.String),
+            pedestalID: params.getParam('pedestalID', ParamType.String),
+            medName: params.getParam('medName', ParamType.String),
+          ),
+        ),
+        FFRoute(
+          name: 'SetUpBottlePage',
+          path: '/setUpBottlePage',
+          builder: (context, params) => SetUpBottlePageWidget(
+            pedestalName: params.getParam('pedestalName', ParamType.String),
+            pedestalID: params.getParam('pedestalID', ParamType.String),
+            pillWeight: params.getParam('pillWeight', ParamType.String),
+            medName: params.getParam('medName', ParamType.String),
+          ),
+        ),
+        FFRoute(
+          name: 'EditMedInfoPage',
+          path: '/editMedInfoPage',
+          builder: (context, params) => EditMedInfoPageWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -340,7 +367,7 @@ class FFRoute {
                     ),
                   ),
                 )
-              : page;
+              : PushNotificationsHandler(child: page);
 
           final transitionInfo = state.transitionInfo;
           return transitionInfo.hasTransition

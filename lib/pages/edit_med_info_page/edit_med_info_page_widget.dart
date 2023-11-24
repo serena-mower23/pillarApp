@@ -1,40 +1,32 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
-import '/components/medication_time_picker_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'edit_med_page_model.dart';
-export 'edit_med_page_model.dart';
+import 'edit_med_info_page_model.dart';
+export 'edit_med_info_page_model.dart';
 
-class EditMedPageWidget extends StatefulWidget {
-  const EditMedPageWidget({
-    Key? key,
-    required this.medID,
-  }) : super(key: key);
-
-  final DocumentReference? medID;
+class EditMedInfoPageWidget extends StatefulWidget {
+  const EditMedInfoPageWidget({Key? key}) : super(key: key);
 
   @override
-  _EditMedPageWidgetState createState() => _EditMedPageWidgetState();
+  _EditMedInfoPageWidgetState createState() => _EditMedInfoPageWidgetState();
 }
 
-class _EditMedPageWidgetState extends State<EditMedPageWidget> {
-  late EditMedPageModel _model;
+class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
+  late EditMedInfoPageModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => EditMedPageModel());
+    _model = createModel(context, () => EditMedInfoPageModel());
 
     _model.medNameFieldController ??= TextEditingController();
     _model.medNameFieldFocusNode ??= FocusNode();
@@ -83,19 +75,7 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
-              context.pushNamed(
-                'MedicationPage',
-                queryParameters: {
-                  'medicationName': serializeParam(
-                    '',
-                    ParamType.String,
-                  ),
-                  'medID': serializeParam(
-                    widget.medID,
-                    ParamType.DocumentReference,
-                  ),
-                }.withoutNulls,
-              );
+              context.pushNamed('HomePage');
             },
             child: Icon(
               Icons.arrow_back_ios,
@@ -108,7 +88,7 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 50.0, 0.0),
               child: Text(
-                'Edit Medication',
+                'Add Medication',
                 style: FlutterFlowTheme.of(context).headlineMedium.override(
                       fontFamily: 'Outfit',
                       color: Colors.white,
@@ -134,6 +114,14 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+                        child: Text(
+                          'Add Medication Info',
+                          style: FlutterFlowTheme.of(context).titleLarge,
+                        ),
+                      ),
+                      Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
                             16.0, 20.0, 8.0, 0.0),
                         child: TextFormField(
@@ -141,7 +129,7 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
                           focusNode: _model.medNameFieldFocusNode,
                           onFieldSubmitted: (_) async {
                             setState(() {
-                              _model.dosageAmountFieldController?.text =
+                              _model.medNameFieldController?.text =
                                   _model.medNameFieldController.text;
                             });
                           },
@@ -239,6 +227,7 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
+                          keyboardType: TextInputType.number,
                           validator: _model.dosageAmountFieldControllerValidator
                               .asValidator(context),
                         ),
@@ -296,6 +285,7 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
+                          keyboardType: TextInputType.number,
                           validator: _model.pillCountFieldControllerValidator
                               .asValidator(context),
                         ),
@@ -353,234 +343,101 @@ class _EditMedPageWidgetState extends State<EditMedPageWidget> {
                             ),
                           ),
                           style: FlutterFlowTheme.of(context).bodyMedium,
+                          keyboardType: TextInputType.number,
                           validator: _model.pillDosageFieldControllerValidator
                               .asValidator(context),
                         ),
                       ),
-                      Theme(
-                        data: ThemeData(
-                          checkboxTheme: CheckboxThemeData(
-                            visualDensity: VisualDensity.compact,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          unselectedWidgetColor:
-                              FlutterFlowTheme.of(context).secondaryText,
-                        ),
-                        child: CheckboxListTile(
-                          value: _model.withFoodTileValue ??= false,
-                          onChanged: (newValue) async {
-                            setState(
-                                () => _model.withFoodTileValue = newValue!);
-                          },
-                          title: Text(
-                            'Take with food',
-                            style: FlutterFlowTheme.of(context).labelMedium,
-                          ),
-                          tileColor: Color(0xFFF1F4F8),
-                          activeColor: Color(0xFFF5ABCF),
-                          checkColor: FlutterFlowTheme.of(context).info,
-                          dense: false,
-                          controlAffinity: ListTileControlAffinity.trailing,
-                        ),
-                      ),
                       Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
-                        child: Text(
-                          'Add Medication Times',
-                          style: FlutterFlowTheme.of(context).titleLarge,
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 8.0, 16.0, 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Medication should be taken with food',
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            ),
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 0.0, 0.0, 0.0),
+                              child: Switch.adaptive(
+                                value: _model.switchValue ??= true,
+                                onChanged: (newValue) async {
+                                  setState(
+                                      () => _model.switchValue = newValue!);
+                                },
+                                activeColor: Color(0xFFF5ABCF),
+                                activeTrackColor:
+                                    FlutterFlowTheme.of(context).accent1,
+                                inactiveTrackColor:
+                                    FlutterFlowTheme.of(context).alternate,
+                                inactiveThumbColor:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-                wrapWithModel(
-                  model: _model.medicationTimePickerModel,
-                  updateCallback: () => setState(() {}),
-                  child: MedicationTimePickerWidget(),
-                ),
-                FFButtonWidget(
-                  onPressed: () async {
-                    setState(() {
-                      _model.addToMedTimes(MedTimeStruct(
-                        hour: int.tryParse(_model
-                            .medicationTimePickerModel.textController1.text),
-                        minute: int.tryParse(_model
-                            .medicationTimePickerModel.textController2.text),
-                        isAM: _model.medicationTimePickerModel.dropDownValue1 ==
-                            'AM',
-                        daysOfTheWeek:
-                            _model.medicationTimePickerModel.dropDownValue2,
-                      ));
-                    });
-                  },
-                  text: 'Add Time',
-                  options: FFButtonOptions(
-                    height: 40.0,
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: Color(0xFFF5ABCF),
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          fontFamily: 'Readex Pro',
-                          color: Colors.white,
-                        ),
-                    elevation: 3.0,
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Current Med Schedule',
-                        style: FlutterFlowTheme.of(context).titleLarge,
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Expanded(
-                      child: Builder(
-                        builder: (context) {
-                          final times = _model.medTimes.toList();
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: times.length,
-                            itemBuilder: (context, timesIndex) {
-                              final timesItem = times[timesIndex];
-                              return Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          '${formatNumber(
-                                            timesItem.hour,
-                                            formatType: FormatType.custom,
-                                            format: '#0',
-                                            locale: '',
-                                          )}:${timesItem.minute.toString()}${timesItem.isAM == true ? 'AM' : 'PM'}',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Text(
-                                          timesItem.daysOfTheWeek.length
-                                              .toString(),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
                 ),
                 Align(
                   alignment: AlignmentDirectional(0.00, 1.00),
                   child: Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 0.0),
-                    child: StreamBuilder<List<UsersRecord>>(
-                      stream: queryUsersRecord(),
-                      builder: (context, snapshot) {
-                        // Customize what your widget looks like when it's loading.
-                        if (!snapshot.hasData) {
-                          return Center(
-                            child: SizedBox(
-                              width: 50.0,
-                              height: 50.0,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF549DA8),
-                                ),
-                              ),
+                    child: FFButtonWidget(
+                      onPressed: () async {
+                        context.pushNamed(
+                          'AddMedTimesPage',
+                          queryParameters: {
+                            'medName': serializeParam(
+                              _model.medNameFieldController.text,
+                              ParamType.String,
                             ),
-                          );
-                        }
-                        List<UsersRecord> buttonUsersRecordList =
-                            snapshot.data!;
-                        return FFButtonWidget(
-                          onPressed: () async {
-                            await MedicationsRecord.createDoc(
-                                    currentUserReference!)
-                                .set({
-                              ...createMedicationsRecordData(
-                                medicationName:
-                                    _model.medNameFieldController.text,
-                                dosageAmount: int.tryParse(
-                                    _model.dosageAmountFieldController.text),
-                                pillCount: int.tryParse(
-                                    _model.pillCountFieldController.text),
-                                pillDosageCount: int.tryParse(
-                                    _model.pillDosageFieldController.text),
-                                withFood: _model.withFoodTileValue,
-                                userID: currentUserReference,
-                              ),
-                              ...mapToFirestore(
-                                {
-                                  'when_to_take': getMedTimeListFirestoreData(
-                                    _model.medTimes,
-                                  ),
-                                },
-                              ),
-                            });
-
-                            context.pushNamed('HomePage');
-                          },
-                          text: 'Edit Medication',
-                          options: FFButtonOptions(
-                            height: 40.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                12.0, 0.0, 12.0, 0.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 0.0),
-                            color: Color(0xFFF5ABCF),
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
+                            'medDosage': serializeParam(
+                              int.tryParse(
+                                  _model.dosageAmountFieldController.text),
+                              ParamType.int,
+                            ),
+                            'pillCount': serializeParam(
+                              int.tryParse(
+                                  _model.pillCountFieldController.text),
+                              ParamType.int,
+                            ),
+                            'withFood': serializeParam(
+                              _model.switchValue,
+                              ParamType.bool,
+                            ),
+                            'pillDosage': serializeParam(
+                              int.tryParse(
+                                  _model.pillDosageFieldController.text),
+                              ParamType.int,
+                            ),
+                          }.withoutNulls,
+                        );
+                      },
+                      text: 'Next Step',
+                      options: FFButtonOptions(
+                        height: 40.0,
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            12.0, 0.0, 12.0, 0.0),
+                        iconPadding:
+                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                        color: Color(0xFFF5ABCF),
+                        textStyle:
+                            FlutterFlowTheme.of(context).titleSmall.override(
                                   fontFamily: 'Readex Pro',
                                   color: Colors.white,
                                 ),
-                            elevation: 3.0,
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        );
-                      },
+                        elevation: 3.0,
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
                     ),
                   ),
                 ),

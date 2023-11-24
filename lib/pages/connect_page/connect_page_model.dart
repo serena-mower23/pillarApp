@@ -1,6 +1,6 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/components/empty_pedestal_list_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -51,10 +51,10 @@ class ConnectPageModel extends FlutterFlowModel<ConnectPageWidget> {
 
   final unfocusNode = FocusNode();
   // Stores action output result for [Custom Action - getConnectedDevices] action in Icon widget.
-  List<BTDeviceStruct>? fetchedConnectedDevices;
+  List<BTDeviceStruct>? fetchedConnecetedDevices;
   // Stores action output result for [Custom Action - findDevices] action in Icon widget.
   List<BTDeviceStruct>? devicesFound;
-  // Stores action output result for [Custom Action - connectDevice] action in ListTile widget.
+  // Stores action output result for [Custom Action - connectDevice] action in Button widget.
   bool? hasWrite;
 
   /// Initialization and disposal methods.

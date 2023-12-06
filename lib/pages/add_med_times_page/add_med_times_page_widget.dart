@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
+import '/custom_code/actions/index.dart' as actions;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +28,10 @@ class AddMedTimesPageWidget extends StatefulWidget {
   }) : super(key: key);
 
   final String? medName;
-  final int? medDosage;
-  final int? pillCount;
+  final String? medDosage;
+  final String? pillCount;
   final bool? withFood;
-  final int? pillDosage;
+  final String? pillDosage;
 
   @override
   _AddMedTimesPageWidgetState createState() => _AddMedTimesPageWidgetState();
@@ -174,8 +175,7 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                                               FlutterFlowTheme.of(context)
                                                   .primaryText,
                                           selectedDateTimeBackgroundColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primary,
+                                              Color(0xFF549DA8),
                                           selectedDateTimeForegroundColor:
                                               FlutterFlowTheme.of(context).info,
                                           actionButtonForegroundColor:
@@ -220,16 +220,21 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 0.0, 0.0, 0.0),
-                                child: Text(
-                                  'Chosen Time: ${valueOrDefault<String>(
-                                    dateTimeFormat('jm', _model.datePicked),
-                                    'No Time Chosen',
-                                  )}',
-                                  style:
-                                      FlutterFlowTheme.of(context).bodyMedium,
+                              Flexible(
+                                child: Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      8.0, 0.0, 0.0, 0.0),
+                                  child: Text(
+                                    valueOrDefault<String>(
+                                      '${valueOrDefault<String>(
+                                        dateTimeFormat('jm', _model.datePicked),
+                                        'No Time Chosen',
+                                      )}',
+                                      'No Time Chosen',
+                                    ),
+                                    style:
+                                        FlutterFlowTheme.of(context).bodyMedium,
+                                  ),
                                 ),
                               ),
                             ],
@@ -261,13 +266,13 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                                         _model.dropDownValueController ??=
                                             FormFieldController<String>(null),
                                     options: [
-                                      'Monday',
-                                      'Tuesday',
-                                      'Wednesday',
-                                      'Thursday',
-                                      'Friday',
-                                      'Saturday',
-                                      'Sunday'
+                                      'Mon',
+                                      'Tue',
+                                      'Wed',
+                                      'Thu',
+                                      'Fri',
+                                      'Sat',
+                                      'Sun'
                                     ],
                                     onChanged: null,
                                     width: 300.0,
@@ -301,6 +306,12 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                                             .toList()
                                             .cast<String>();
                                       });
+                                      setState(() {
+                                        _model.selectEveryDay = false;
+                                      });
+                                      setState(() {
+                                        _model.switchValue = false;
+                                      });
                                     },
                                   ),
                                 ),
@@ -325,7 +336,8 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     16.0, 0.0, 0.0, 0.0),
                                 child: Switch.adaptive(
-                                  value: _model.switchValue ??= true,
+                                  value: _model.switchValue ??=
+                                      _model.selectEveryDay,
                                   onChanged: (newValue) async {
                                     setState(
                                         () => _model.switchValue = newValue!);
@@ -362,68 +374,37 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                   ),
                 ),
                 FFButtonWidget(
-                  onPressed: () async {
-                    setState(() {
-                      _model.addToMedTimesList(MedTimeStruct(
-                        monday: _model.medDays.contains(FFAppConstants.monday),
-                        tuesday:
-                            _model.medDays.contains(FFAppConstants.tuesday),
-                        wednesday:
-                            _model.medDays.contains(FFAppConstants.wednesday),
-                        thursday:
-                            _model.medDays.contains(FFAppConstants.thursday),
-                        friday: _model.medDays.contains(FFAppConstants.friday),
-                        saturday:
-                            _model.medDays.contains(FFAppConstants.saturday),
-                        sunday: _model.medDays.contains(FFAppConstants.sunday),
-                        time: _model.datePicked,
-                      ));
-                    });
-
-                    var medicationTimesRecordReference =
-                        MedicationTimesRecord.createDoc(currentUserReference!);
-                    await medicationTimesRecordReference
-                        .set(createMedicationTimesRecordData(
-                      monday: _model.medDays.contains(FFAppConstants.monday),
-                      tuesday: _model.medDays.contains(FFAppConstants.tuesday),
-                      wednesday:
-                          _model.medDays.contains(FFAppConstants.wednesday),
-                      thursday:
-                          _model.medDays.contains(FFAppConstants.thursday),
-                      friday: _model.medDays.contains(FFAppConstants.friday),
-                      saturday:
-                          _model.medDays.contains(FFAppConstants.saturday),
-                      sunday: _model.medDays.contains(FFAppConstants.sunday),
-                      time: _model.datePicked,
-                    ));
-                    _model.newTime = MedicationTimesRecord.getDocumentFromData(
-                        createMedicationTimesRecordData(
-                          monday:
-                              _model.medDays.contains(FFAppConstants.monday),
-                          tuesday:
-                              _model.medDays.contains(FFAppConstants.tuesday),
-                          wednesday:
-                              _model.medDays.contains(FFAppConstants.wednesday),
-                          thursday:
-                              _model.medDays.contains(FFAppConstants.thursday),
-                          friday:
-                              _model.medDays.contains(FFAppConstants.friday),
-                          saturday:
-                              _model.medDays.contains(FFAppConstants.saturday),
-                          sunday:
-                              _model.medDays.contains(FFAppConstants.sunday),
-                          time: _model.datePicked,
-                        ),
-                        medicationTimesRecordReference);
-                    setState(() {
-                      _model.addToMedTimes(_model.newTime!.reference);
-                    });
-                    setState(() {
-                      _model.addToMedTimesInfo(_model.datePicked!);
-                    });
-
-                    setState(() {});
-                  },
+                  onPressed: _model.datePicked == null
+                      ? null
+                      : () async {
+                          setState(() {
+                            _model.addToMedTimesList(MedTimeStruct(
+                              monday: _model.medDays
+                                  .contains(FFAppConstants.monday),
+                              tuesday: _model.medDays
+                                  .contains(FFAppConstants.tuesday),
+                              wednesday: _model.medDays
+                                  .contains(FFAppConstants.wednesday),
+                              thursday: _model.medDays
+                                  .contains(FFAppConstants.thursday),
+                              friday: _model.medDays
+                                  .contains(FFAppConstants.friday),
+                              saturday: _model.medDays
+                                  .contains(FFAppConstants.saturday),
+                              sunday: _model.medDays
+                                  .contains(FFAppConstants.sunday),
+                              time: _model.datePicked,
+                              medName: widget.medName,
+                              adherence: 0,
+                              occurrences: 0,
+                              creationDate: getCurrentTimestamp,
+                              takenToday: false,
+                            ));
+                          });
+                          setState(() {
+                            _model.addToMedTimesInfo(_model.datePicked!);
+                          });
+                        },
                   text: 'Add Time',
                   options: FFButtonOptions(
                     height: 40.0,
@@ -442,6 +423,7 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                       width: 1.0,
                     ),
                     borderRadius: BorderRadius.circular(8.0),
+                    disabledColor: Color(0xFFB2B2B2),
                   ),
                 ),
                 Padding(
@@ -508,6 +490,48 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                                       ],
                                     ),
                                   ),
+                                  Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 16.0, 0.0),
+                                        child: FFButtonWidget(
+                                          onPressed: () async {
+                                            setState(() {
+                                              _model.removeFromMedTimesList(
+                                                  timesItem);
+                                            });
+                                          },
+                                          text: 'Delete',
+                                          options: FFButtonOptions(
+                                            height: 40.0,
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    24.0, 0.0, 24.0, 0.0),
+                                            iconPadding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 0.0),
+                                            color: Color(0xFFF5ABCF),
+                                            textStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleSmall
+                                                    .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      color: Colors.white,
+                                                    ),
+                                            elevation: 3.0,
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               );
                             },
@@ -523,43 +547,50 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 0.0),
                     child: FFButtonWidget(
-                      onPressed: () async {
-                        await currentUserReference!.update({
-                          ...mapToFirestore(
-                            {
-                              'medications': FieldValue.arrayUnion([
-                                getMedInfoFirestoreData(
-                                  createMedInfoStruct(
-                                    medicationName: widget.medName,
-                                    dosageAmount: widget.medDosage,
-                                    pillCount: widget.pillCount,
-                                    pillDosageCount: widget.pillDosage,
-                                    withFood: widget.withFood,
-                                    fieldValues: {
-                                      'when_to_take':
-                                          getMedTimeListFirestoreData(
-                                        _model.medTimesList,
-                                      ),
-                                    },
-                                    clearUnsetFields: false,
-                                  ),
-                                  true,
-                                )
-                              ]),
-                            },
-                          ),
-                        });
+                      onPressed: _model.medTimesList.length == 0
+                          ? null
+                          : () async {
+                              await actions.setMedReminders(
+                                widget.medName!,
+                                _model.medTimesList.toList(),
+                              );
 
-                        context.pushNamed(
-                          'MedicationPage',
-                          queryParameters: {
-                            'medicationName': serializeParam(
-                              widget.medName,
-                              ParamType.String,
-                            ),
-                          }.withoutNulls,
-                        );
-                      },
+                              await currentUserReference!.update({
+                                ...mapToFirestore(
+                                  {
+                                    'medications': FieldValue.arrayUnion([
+                                      getMedInfoFirestoreData(
+                                        createMedInfoStruct(
+                                          medicationName: widget.medName,
+                                          withFood: widget.withFood,
+                                          dosageAmount: widget.medDosage,
+                                          pillCount: widget.pillCount,
+                                          pillCountDosage: widget.pillDosage,
+                                          fieldValues: {
+                                            'when_to_take':
+                                                getMedTimeListFirestoreData(
+                                              _model.medTimesList,
+                                            ),
+                                          },
+                                          clearUnsetFields: false,
+                                        ),
+                                        true,
+                                      )
+                                    ]),
+                                  },
+                                ),
+                              });
+
+                              context.pushNamed(
+                                'MedicationPage',
+                                queryParameters: {
+                                  'medicationName': serializeParam(
+                                    widget.medName,
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,
+                              );
+                            },
                       text: 'Add Medication',
                       options: FFButtonOptions(
                         height: 40.0,
@@ -579,8 +610,26 @@ class _AddMedTimesPageWidgetState extends State<AddMedTimesPageWidget> {
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(8.0),
+                        disabledColor: Color(0xFFB2B2B2),
                       ),
                     ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'Make sure you add at least one time before continuing.',
+                          textAlign: TextAlign.center,
+                          style: FlutterFlowTheme.of(context).labelMedium,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

@@ -14,11 +14,10 @@ Future<MedInfoStruct?> getMedicationInfo(
 ) async {
   // Add your function code here!
 
-  MedInfoStruct? medInfo = null;
-
-  for (MedInfoStruct listItem in medList) {
-    if (listItem.medicationName == medName) {
-      medInfo = listItem;
+  MedInfoStruct? medInfo;
+  for (int i = 0; i < medList.length; i++) {
+    if (medList[i].medicationName == medName) {
+      medInfo = medList[i];
       break;
     }
   }

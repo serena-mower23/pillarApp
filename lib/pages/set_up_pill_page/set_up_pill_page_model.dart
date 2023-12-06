@@ -24,7 +24,7 @@ class SetUpPillPageModel extends FlutterFlowModel<SetUpPillPageWidget> {
 
   final unfocusNode = FocusNode();
   // Stores action output result for [Custom Action - connectDevice] action in SetUpPillPage widget.
-  bool? connectedDevice;
+  BTDeviceStruct? connectedDevice;
   InstantTimer? onePillTimer;
   // Stores action output result for [Custom Action - receiveData] action in Button widget.
   String? pillValue;

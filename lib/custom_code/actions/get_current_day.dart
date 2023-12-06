@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-Future weeklyAdherence() async {
-  // Add your function code here!
+Future<String> getCurrentDay() async {
+  final weekDays = FFAppConstants.daysOfTheWeek;
+  final now = DateTime.now();
+  return weekDays[now.weekday - 1];
 }

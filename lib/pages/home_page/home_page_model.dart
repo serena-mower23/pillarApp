@@ -1,9 +1,12 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/components/empty_medication_list_widget.dart';
+import '/components/med_item_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/custom_code/actions/index.dart' as actions;
 import 'home_page_widget.dart' show HomePageWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -53,16 +56,38 @@ class HomePageModel extends FlutterFlowModel<HomePageWidget> {
   void updateMedsAtIndex(int index, Function(MedInfoStruct) updateFn) =>
       meds[index] = updateFn(meds[index]);
 
+  List<MedTimeStruct> todayMedsSchedule = [];
+  void addToTodayMedsSchedule(MedTimeStruct item) =>
+      todayMedsSchedule.add(item);
+  void removeFromTodayMedsSchedule(MedTimeStruct item) =>
+      todayMedsSchedule.remove(item);
+  void removeAtIndexFromTodayMedsSchedule(int index) =>
+      todayMedsSchedule.removeAt(index);
+  void insertAtIndexInTodayMedsSchedule(int index, MedTimeStruct item) =>
+      todayMedsSchedule.insert(index, item);
+  void updateTodayMedsScheduleAtIndex(
+          int index, Function(MedTimeStruct) updateFn) =>
+      todayMedsSchedule[index] = updateFn(todayMedsSchedule[index]);
+
+  BTDeviceStruct? connectedPedestal;
+  void updateConnectedPedestalStruct(Function(BTDeviceStruct) updateFn) =>
+      updateFn(connectedPedestal ??= BTDeviceStruct());
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
+  // Models for MedItem dynamic component.
+  late FlutterFlowDynamicModels<MedItemModel> medItemModels;
 
   /// Initialization and disposal methods.
 
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    medItemModels = FlutterFlowDynamicModels(() => MedItemModel());
+  }
 
   void dispose() {
     unfocusNode.dispose();
+    medItemModels.dispose();
   }
 
   /// Action blocks are added here.

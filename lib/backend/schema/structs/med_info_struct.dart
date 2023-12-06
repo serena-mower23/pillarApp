@@ -11,24 +11,24 @@ import '/flutter_flow/flutter_flow_util.dart';
 class MedInfoStruct extends FFFirebaseStruct {
   MedInfoStruct({
     String? medicationName,
-    int? dosageAmount,
-    int? pillCount,
-    int? pillDosageCount,
     bool? withFood,
     List<MedTimeStruct>? whenToTake,
     String? pillWeight,
     String? pillBottleWeight,
     BTDeviceStruct? pedestalInfo,
+    String? dosageAmount,
+    String? pillCount,
+    String? pillCountDosage,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _medicationName = medicationName,
-        _dosageAmount = dosageAmount,
-        _pillCount = pillCount,
-        _pillDosageCount = pillDosageCount,
         _withFood = withFood,
         _whenToTake = whenToTake,
         _pillWeight = pillWeight,
         _pillBottleWeight = pillBottleWeight,
         _pedestalInfo = pedestalInfo,
+        _dosageAmount = dosageAmount,
+        _pillCount = pillCount,
+        _pillCountDosage = pillCountDosage,
         super(firestoreUtilData);
 
   // "medication_name" field.
@@ -36,29 +36,6 @@ class MedInfoStruct extends FFFirebaseStruct {
   String get medicationName => _medicationName ?? '';
   set medicationName(String? val) => _medicationName = val;
   bool hasMedicationName() => _medicationName != null;
-
-  // "dosage_amount" field.
-  int? _dosageAmount;
-  int get dosageAmount => _dosageAmount ?? 0;
-  set dosageAmount(int? val) => _dosageAmount = val;
-  void incrementDosageAmount(int amount) =>
-      _dosageAmount = dosageAmount + amount;
-  bool hasDosageAmount() => _dosageAmount != null;
-
-  // "pill_count" field.
-  int? _pillCount;
-  int get pillCount => _pillCount ?? 0;
-  set pillCount(int? val) => _pillCount = val;
-  void incrementPillCount(int amount) => _pillCount = pillCount + amount;
-  bool hasPillCount() => _pillCount != null;
-
-  // "pill_dosage_count" field.
-  int? _pillDosageCount;
-  int get pillDosageCount => _pillDosageCount ?? 0;
-  set pillDosageCount(int? val) => _pillDosageCount = val;
-  void incrementPillDosageCount(int amount) =>
-      _pillDosageCount = pillDosageCount + amount;
-  bool hasPillDosageCount() => _pillDosageCount != null;
 
   // "with_food" field.
   bool? _withFood;
@@ -94,11 +71,26 @@ class MedInfoStruct extends FFFirebaseStruct {
       updateFn(_pedestalInfo ??= BTDeviceStruct());
   bool hasPedestalInfo() => _pedestalInfo != null;
 
+  // "dosage_amount" field.
+  String? _dosageAmount;
+  String get dosageAmount => _dosageAmount ?? '';
+  set dosageAmount(String? val) => _dosageAmount = val;
+  bool hasDosageAmount() => _dosageAmount != null;
+
+  // "pill_count" field.
+  String? _pillCount;
+  String get pillCount => _pillCount ?? '';
+  set pillCount(String? val) => _pillCount = val;
+  bool hasPillCount() => _pillCount != null;
+
+  // "pill_count_dosage" field.
+  String? _pillCountDosage;
+  String get pillCountDosage => _pillCountDosage ?? '';
+  set pillCountDosage(String? val) => _pillCountDosage = val;
+  bool hasPillCountDosage() => _pillCountDosage != null;
+
   static MedInfoStruct fromMap(Map<String, dynamic> data) => MedInfoStruct(
         medicationName: data['medication_name'] as String?,
-        dosageAmount: castToType<int>(data['dosage_amount']),
-        pillCount: castToType<int>(data['pill_count']),
-        pillDosageCount: castToType<int>(data['pill_dosage_count']),
         withFood: data['with_food'] as bool?,
         whenToTake: getStructList(
           data['when_to_take'],
@@ -107,6 +99,9 @@ class MedInfoStruct extends FFFirebaseStruct {
         pillWeight: data['pill_weight'] as String?,
         pillBottleWeight: data['pill_bottle_weight'] as String?,
         pedestalInfo: BTDeviceStruct.maybeFromMap(data['pedestal_info']),
+        dosageAmount: data['dosage_amount'] as String?,
+        pillCount: data['pill_count'] as String?,
+        pillCountDosage: data['pill_count_dosage'] as String?,
       );
 
   static MedInfoStruct? maybeFromMap(dynamic data) =>
@@ -114,14 +109,14 @@ class MedInfoStruct extends FFFirebaseStruct {
 
   Map<String, dynamic> toMap() => {
         'medication_name': _medicationName,
-        'dosage_amount': _dosageAmount,
-        'pill_count': _pillCount,
-        'pill_dosage_count': _pillDosageCount,
         'with_food': _withFood,
         'when_to_take': _whenToTake?.map((e) => e.toMap()).toList(),
         'pill_weight': _pillWeight,
         'pill_bottle_weight': _pillBottleWeight,
         'pedestal_info': _pedestalInfo?.toMap(),
+        'dosage_amount': _dosageAmount,
+        'pill_count': _pillCount,
+        'pill_count_dosage': _pillCountDosage,
       }.withoutNulls;
 
   @override
@@ -129,18 +124,6 @@ class MedInfoStruct extends FFFirebaseStruct {
         'medication_name': serializeParam(
           _medicationName,
           ParamType.String,
-        ),
-        'dosage_amount': serializeParam(
-          _dosageAmount,
-          ParamType.int,
-        ),
-        'pill_count': serializeParam(
-          _pillCount,
-          ParamType.int,
-        ),
-        'pill_dosage_count': serializeParam(
-          _pillDosageCount,
-          ParamType.int,
         ),
         'with_food': serializeParam(
           _withFood,
@@ -163,6 +146,18 @@ class MedInfoStruct extends FFFirebaseStruct {
           _pedestalInfo,
           ParamType.DataStruct,
         ),
+        'dosage_amount': serializeParam(
+          _dosageAmount,
+          ParamType.String,
+        ),
+        'pill_count': serializeParam(
+          _pillCount,
+          ParamType.String,
+        ),
+        'pill_count_dosage': serializeParam(
+          _pillCountDosage,
+          ParamType.String,
+        ),
       }.withoutNulls;
 
   static MedInfoStruct fromSerializableMap(Map<String, dynamic> data) =>
@@ -170,21 +165,6 @@ class MedInfoStruct extends FFFirebaseStruct {
         medicationName: deserializeParam(
           data['medication_name'],
           ParamType.String,
-          false,
-        ),
-        dosageAmount: deserializeParam(
-          data['dosage_amount'],
-          ParamType.int,
-          false,
-        ),
-        pillCount: deserializeParam(
-          data['pill_count'],
-          ParamType.int,
-          false,
-        ),
-        pillDosageCount: deserializeParam(
-          data['pill_dosage_count'],
-          ParamType.int,
           false,
         ),
         withFood: deserializeParam(
@@ -214,6 +194,21 @@ class MedInfoStruct extends FFFirebaseStruct {
           false,
           structBuilder: BTDeviceStruct.fromSerializableMap,
         ),
+        dosageAmount: deserializeParam(
+          data['dosage_amount'],
+          ParamType.String,
+          false,
+        ),
+        pillCount: deserializeParam(
+          data['pill_count'],
+          ParamType.String,
+          false,
+        ),
+        pillCountDosage: deserializeParam(
+          data['pill_count_dosage'],
+          ParamType.String,
+          false,
+        ),
       );
 
   @override
@@ -224,39 +219,39 @@ class MedInfoStruct extends FFFirebaseStruct {
     const listEquality = ListEquality();
     return other is MedInfoStruct &&
         medicationName == other.medicationName &&
-        dosageAmount == other.dosageAmount &&
-        pillCount == other.pillCount &&
-        pillDosageCount == other.pillDosageCount &&
         withFood == other.withFood &&
         listEquality.equals(whenToTake, other.whenToTake) &&
         pillWeight == other.pillWeight &&
         pillBottleWeight == other.pillBottleWeight &&
-        pedestalInfo == other.pedestalInfo;
+        pedestalInfo == other.pedestalInfo &&
+        dosageAmount == other.dosageAmount &&
+        pillCount == other.pillCount &&
+        pillCountDosage == other.pillCountDosage;
   }
 
   @override
   int get hashCode => const ListEquality().hash([
         medicationName,
-        dosageAmount,
-        pillCount,
-        pillDosageCount,
         withFood,
         whenToTake,
         pillWeight,
         pillBottleWeight,
-        pedestalInfo
+        pedestalInfo,
+        dosageAmount,
+        pillCount,
+        pillCountDosage
       ]);
 }
 
 MedInfoStruct createMedInfoStruct({
   String? medicationName,
-  int? dosageAmount,
-  int? pillCount,
-  int? pillDosageCount,
   bool? withFood,
   String? pillWeight,
   String? pillBottleWeight,
   BTDeviceStruct? pedestalInfo,
+  String? dosageAmount,
+  String? pillCount,
+  String? pillCountDosage,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
@@ -264,14 +259,14 @@ MedInfoStruct createMedInfoStruct({
 }) =>
     MedInfoStruct(
       medicationName: medicationName,
-      dosageAmount: dosageAmount,
-      pillCount: pillCount,
-      pillDosageCount: pillDosageCount,
       withFood: withFood,
       pillWeight: pillWeight,
       pillBottleWeight: pillBottleWeight,
       pedestalInfo:
           pedestalInfo ?? (clearUnsetFields ? BTDeviceStruct() : null),
+      dosageAmount: dosageAmount,
+      pillCount: pillCount,
+      pillCountDosage: pillCountDosage,
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,

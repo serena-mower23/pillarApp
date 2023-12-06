@@ -360,7 +360,7 @@ class _NewAccountPageWidgetState extends State<NewAccountPageWidget> {
                                   final user =
                                       await authManager.createAccountWithEmail(
                                     context,
-                                    _model.usernameFieldController.text,
+                                    _model.emailFieldController.text,
                                     _model.passwordFieldController.text,
                                   );
                                   if (user == null) {

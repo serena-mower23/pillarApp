@@ -1,4 +1,5 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -7,6 +8,7 @@ import '/flutter_flow/instant_timer.dart';
 import 'dart:async';
 import '/custom_code/actions/index.dart' as actions;
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -179,6 +181,23 @@ class _SetUpBottlePageWidgetState extends State<SetUpBottlePageWidget> {
                         alignment: AlignmentDirectional(0.00, -1.00),
                         child: FFButtonWidget(
                           onPressed: () async {
+                            await showDialog(
+                              context: context,
+                              builder: (alertDialogContext) {
+                                return AlertDialog(
+                                  title: Text('Warning'),
+                                  content: Text(
+                                      'Please make sure to put the pill you just measured back in before continuing. '),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(alertDialogContext),
+                                      child: Text('Continue'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                             unawaited(
                               () async {
                                 await showDialog(
@@ -280,19 +299,47 @@ class _SetUpBottlePageWidgetState extends State<SetUpBottlePageWidget> {
                                 _model.bottleWeight == ''
                             ? null
                             : () async {
-                                await actions.updateMedInfoAfterSetup(
-                                  currentUserReference!.id,
+                                _model.updatedMedications =
+                                    await actions.updateMedInfoAfterSetup(
+                                  (currentUserDocument?.medications?.toList() ??
+                                          [])
+                                      .toList(),
                                   widget.medName!,
+                                  widget.pillWeight!,
+                                  _model.bottleWeight,
                                   BTDeviceStruct(
                                     name: widget.pedestalName,
                                     id: widget.pedestalID,
                                   ),
-                                  widget.pillWeight!,
-                                  _model.bottleWeight,
                                 );
-                                setState(() {
-                                  _model.bottleWeight = '';
+
+                                await currentUserReference!.update({
+                                  ...mapToFirestore(
+                                    {
+                                      'medications':
+                                          getMedInfoListFirestoreData(
+                                        _model.updatedMedications,
+                                      ),
+                                    },
+                                  ),
                                 });
+                                await showDialog(
+                                  context: context,
+                                  builder: (alertDialogContext) {
+                                    return AlertDialog(
+                                      title: Text('Set Up Complete'),
+                                      content: Text(
+                                          'Please put your medicine back on the pedestal. '),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
 
                                 context.pushNamed(
                                   'MedicationPage',
@@ -303,6 +350,8 @@ class _SetUpBottlePageWidgetState extends State<SetUpBottlePageWidget> {
                                     ),
                                   }.withoutNulls,
                                 );
+
+                                setState(() {});
                               },
                         text: 'Finish Setup',
                         options: FFButtonOptions(

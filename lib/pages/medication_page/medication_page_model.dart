@@ -1,3 +1,4 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -32,8 +33,6 @@ class MedicationPageModel extends FlutterFlowModel<MedicationPageWidget> {
           int index, Function(BTDeviceStruct) updateFn) =>
       connectedDevices[index] = updateFn(connectedDevices[index]);
 
-  DocumentReference? medID;
-
   MedInfoStruct? medicationInfo;
   void updateMedicationInfoStruct(Function(MedInfoStruct) updateFn) =>
       updateFn(medicationInfo ??= MedInfoStruct());
@@ -47,13 +46,28 @@ class MedicationPageModel extends FlutterFlowModel<MedicationPageWidget> {
   void updateMedsAtIndex(int index, Function(MedInfoStruct) updateFn) =>
       meds[index] = updateFn(meds[index]);
 
+  List<MedTimeStruct> medTimes = [];
+  void addToMedTimes(MedTimeStruct item) => medTimes.add(item);
+  void removeFromMedTimes(MedTimeStruct item) => medTimes.remove(item);
+  void removeAtIndexFromMedTimes(int index) => medTimes.removeAt(index);
+  void insertAtIndexInMedTimes(int index, MedTimeStruct item) =>
+      medTimes.insert(index, item);
+  void updateMedTimesAtIndex(int index, Function(MedTimeStruct) updateFn) =>
+      medTimes[index] = updateFn(medTimes[index]);
+
+  String? adherence;
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // Stores action output result for [Custom Action - getConnectedDevices] action in MedicationPage widget.
-  List<BTDeviceStruct>? fetchedConnectedDevices;
+  // Stores action output result for [Custom Action - updateOccurrences] action in MedicationPage widget.
+  List<MedInfoStruct>? occurrencesUpdate;
   // Stores action output result for [Custom Action - getMedicationInfo] action in MedicationPage widget.
   MedInfoStruct? medInfo;
+  // Stores action output result for [Custom Action - totalAdherence] action in MedicationPage widget.
+  double? totalAdherence;
+  // Stores action output result for [Custom Action - connectDevice] action in MedicationPage widget.
+  BTDeviceStruct? connectedDevice;
 
   /// Initialization and disposal methods.
 

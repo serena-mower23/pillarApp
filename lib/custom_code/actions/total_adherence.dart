@@ -20,6 +20,10 @@ Future<double> totalAdherence(MedInfoStruct medInfo) async {
     occurrences += medTime.occurrences;
   }
 
+  if (occurrences == 0) {
+    return -1;
+  }
+
   double percentageAdherence = (adherence / occurrences) * 100;
 
   return percentageAdherence;

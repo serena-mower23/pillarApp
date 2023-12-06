@@ -1,3 +1,4 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -41,15 +42,50 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
       setState(() {
         _model.isFetchingConnectedDevices = true;
       });
-      _model.fetchedConnectedDevices = await actions.getConnectedDevices();
       setState(() {
-        _model.connectedDevices =
-            _model.fetchedConnectedDevices!.toList().cast<BTDeviceStruct>();
-        _model.isFetchingConnectedDevices = false;
+        _model.meds = (currentUserDocument?.medications?.toList() ?? [])
+            .toList()
+            .cast<MedInfoStruct>();
+      });
+      _model.occurrencesUpdate = await actions.updateOccurrences(
+        _model.meds.toList(),
+      );
+
+      await currentUserReference!.update({
+        ...mapToFirestore(
+          {
+            'medications': getMedInfoListFirestoreData(
+              _model.occurrencesUpdate,
+            ),
+          },
+        ),
+      });
+      setState(() {
+        _model.meds = (currentUserDocument?.medications?.toList() ?? [])
+            .toList()
+            .cast<MedInfoStruct>();
       });
       _model.medInfo = await actions.getMedicationInfo(
         _model.meds.toList(),
         widget.medicationName!,
+      );
+      setState(() {
+        _model.medicationInfo = _model.medInfo;
+      });
+      setState(() {
+        _model.medTimes =
+            _model.medInfo!.whenToTake.toList().cast<MedTimeStruct>();
+      });
+      _model.totalAdherence = await actions.totalAdherence(
+        _model.medicationInfo!,
+      );
+      setState(() {
+        _model.adherence = _model.totalAdherence == -1.0
+            ? 'No Adherence Available'
+            : '${_model.totalAdherence?.toString()} %';
+      });
+      _model.connectedDevice = await actions.connectDevice(
+        _model.medicationInfo!.pedestalInfo,
       );
     });
   }
@@ -98,20 +134,59 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
           ),
           title: Align(
             alignment: AlignmentDirectional(0.00, -1.00),
-            child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 48.0, 0.0),
-              child: Text(
-                'Medication',
-                style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      fontFamily: 'Outfit',
-                      color: Colors.white,
-                      fontSize: 22.0,
-                    ),
-              ),
+            child: Text(
+              'Medication',
+              style: FlutterFlowTheme.of(context).headlineMedium.override(
+                    fontFamily: 'Outfit',
+                    color: Colors.white,
+                    fontSize: 22.0,
+                  ),
             ),
           ),
-          actions: [],
-          centerTitle: false,
+          actions: [
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 16.0, 0.0),
+              child: InkWell(
+                splashColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: () async {
+                  context.pushNamed(
+                    'EditMedInfoPage',
+                    queryParameters: {
+                      'medName': serializeParam(
+                        widget.medicationName,
+                        ParamType.String,
+                      ),
+                      'dosageAmount': serializeParam(
+                        _model.medicationInfo?.dosageAmount,
+                        ParamType.String,
+                      ),
+                      'pillCount': serializeParam(
+                        _model.medicationInfo?.pillCount,
+                        ParamType.String,
+                      ),
+                      'pillCountDosage': serializeParam(
+                        _model.medicationInfo?.pillCountDosage,
+                        ParamType.String,
+                      ),
+                      'withFood': serializeParam(
+                        _model.medicationInfo?.withFood,
+                        ParamType.bool,
+                      ),
+                    }.withoutNulls,
+                  );
+                },
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+            ),
+          ],
+          centerTitle: true,
           elevation: 2.0,
         ),
         body: SafeArea(
@@ -136,7 +211,10 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
-                                widget.medicationName!,
+                                valueOrDefault<String>(
+                                  widget.medicationName,
+                                  'medName',
+                                ),
                                 style: FlutterFlowTheme.of(context).titleLarge,
                               ),
                             ],
@@ -172,7 +250,10 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   16.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                '${_model.medInfo?.dosageAmount?.toString()} mg',
+                                valueOrDefault<String>(
+                                  '${_model.medInfo?.dosageAmount} mg',
+                                  'medDosage',
+                                ),
                                 style: FlutterFlowTheme.of(context).bodyMedium,
                               ),
                             ),
@@ -183,7 +264,7 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                   ),
                   Padding(
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -208,7 +289,20 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   16.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                '${_model.medInfo?.pillCount?.toString()} pills',
+                                () {
+                                  if (_model.medicationInfo?.pillCount ==
+                                      '0.0') {
+                                    return 'Please Refill Medication';
+                                  } else if ((_model
+                                              .medicationInfo?.pillCount ==
+                                          '1') ||
+                                      (_model.medicationInfo?.pillCount ==
+                                          '1.0')) {
+                                    return '${_model.medInfo?.pillCount} pill';
+                                  } else {
+                                    return '${_model.medInfo?.pillCount} pills';
+                                  }
+                                }(),
                                 style: FlutterFlowTheme.of(context).bodyMedium,
                               ),
                             ),
@@ -219,7 +313,7 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                   ),
                   Padding(
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -244,7 +338,13 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   16.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                '${_model.medInfo?.pillDosageCount?.toString()} mg',
+                                (_model.medicationInfo?.pillCountDosage ==
+                                            '1') ||
+                                        (_model.medicationInfo
+                                                ?.pillCountDosage ==
+                                            '1.0')
+                                    ? '${_model.medicationInfo?.pillCountDosage} pill'
+                                    : 'pills',
                                 style: FlutterFlowTheme.of(context).bodyMedium,
                               ),
                             ),
@@ -255,7 +355,7 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                   ),
                   Padding(
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -375,46 +475,120 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                               itemCount: times.length,
                               itemBuilder: (context, timesIndex) {
                                 final timesItem = times[timesIndex];
-                                return Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Text(
-                                            valueOrDefault<String>(
-                                              timesItem.time?.toString(),
-                                              'No Time Recorded',
+                                return Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      16.0, 8.0, 16.0, 8.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Text(
+                                              valueOrDefault<String>(
+                                                dateTimeFormat(
+                                                    'jm', timesItem.time),
+                                                'No Time Recorded',
+                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium,
                                             ),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium,
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Text(
-                                            timesItem.sunday &&
-                                                    timesItem.monday &&
-                                                    timesItem.tuesday &&
-                                                    timesItem.wednesday &&
-                                                    timesItem.thursday &&
-                                                    timesItem.friday &&
-                                                    timesItem.saturday
-                                                ? 'Everyday'
-                                                : '${timesItem.sunday ? 'Sun ' : ''}${timesItem.monday ? 'Mon ' : ''}${timesItem.tuesday ? 'Tue ' : ''}${timesItem.wednesday ? 'Wed ' : ''}${timesItem.thursday ? 'Thu ' : ''}${timesItem.friday ? 'Fri ' : ''}${timesItem.saturday ? 'Sat' : ''}',
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium,
-                                          ),
-                                        ],
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Text(
+                                              timesItem.sunday &&
+                                                      timesItem.monday &&
+                                                      timesItem.tuesday &&
+                                                      timesItem.wednesday &&
+                                                      timesItem.thursday &&
+                                                      timesItem.friday &&
+                                                      timesItem.saturday
+                                                  ? 'Everyday'
+                                                  : '${timesItem.sunday ? 'Sun ' : ''}${timesItem.monday ? 'Mon ' : ''}${timesItem.tuesday ? 'Tue ' : ''}${timesItem.wednesday ? 'Wed ' : ''}${timesItem.thursday ? 'Thu ' : ''}${timesItem.friday ? 'Fri ' : ''}${timesItem.saturday ? 'Sat' : ''}',
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium,
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      if (false)
+                                        FFButtonWidget(
+                                          onPressed: timesItem.takenToday ||
+                                                  (_model.medInfo?.pillCount ==
+                                                      '0.0') ||
+                                                  !_model.medicationInfo!
+                                                      .pedestalInfo
+                                                      .hasId()
+                                              ? null
+                                              : () async {
+                                                  context.pushNamed(
+                                                    'TakeMedPage',
+                                                    queryParameters: {
+                                                      'medicationName':
+                                                          serializeParam(
+                                                        widget.medicationName,
+                                                        ParamType.String,
+                                                      ),
+                                                      'medicationTime':
+                                                          serializeParam(
+                                                        timesItem.time,
+                                                        ParamType.DateTime,
+                                                      ),
+                                                      'pedestalID':
+                                                          serializeParam(
+                                                        _model.medicationInfo
+                                                            ?.pedestalInfo?.id,
+                                                        ParamType.String,
+                                                      ),
+                                                      'pedestalName':
+                                                          serializeParam(
+                                                        _model
+                                                            .medicationInfo
+                                                            ?.pedestalInfo
+                                                            ?.name,
+                                                        ParamType.String,
+                                                      ),
+                                                    }.withoutNulls,
+                                                  );
+                                                },
+                                          text: 'Take Med',
+                                          options: FFButtonOptions(
+                                            height: 40.0,
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    8.0, 0.0, 8.0, 0.0),
+                                            iconPadding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 0.0),
+                                            color: Color(0xFFF5ABCF),
+                                            textStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleSmall
+                                                    .override(
+                                                      fontFamily: 'Readex Pro',
+                                                      color: Colors.white,
+                                                    ),
+                                            elevation: 3.0,
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            disabledColor: Color(0xFFB2B2B2),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 );
                               },
                             );
@@ -430,16 +604,13 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Align(
-                          alignment: AlignmentDirectional(0.00, -1.00),
-                          child: Text(
-                            'Weekly Adherence',
-                            style:
-                                FlutterFlowTheme.of(context).bodyLarge.override(
-                                      fontFamily: 'Readex Pro',
-                                      fontSize: 20.0,
-                                    ),
-                          ),
+                        Text(
+                          'Adherence',
+                          style:
+                              FlutterFlowTheme.of(context).bodyLarge.override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 20.0,
+                                  ),
                         ),
                       ],
                     ),
@@ -451,28 +622,12 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Align(
-                          alignment: AlignmentDirectional(0.00, -1.00),
-                          child: Text(
-                            'Total Adherence',
-                            style:
-                                FlutterFlowTheme.of(context).bodyLarge.override(
-                                      fontFamily: 'Readex Pro',
-                                      fontSize: 20.0,
-                                    ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
                         Text(
-                          'Hello World',
+                          valueOrDefault<String>(
+                            _model.adherence,
+                            'No Adherence Available',
+                          ),
+                          textAlign: TextAlign.center,
                           style: FlutterFlowTheme.of(context).bodyMedium,
                         ),
                       ],
@@ -529,16 +684,24 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                           FFButtonWidget(
                             onPressed: () async {
                               context.pushNamed(
-                                'PedestalSettingsPage',
+                                'MedicationSettingsPage',
                                 queryParameters: {
                                   'medName': serializeParam(
                                     widget.medicationName,
                                     ParamType.String,
                                   ),
+                                  'pedestalID': serializeParam(
+                                    _model.medicationInfo?.pedestalInfo?.id,
+                                    ParamType.String,
+                                  ),
+                                  'pedestalName': serializeParam(
+                                    _model.medicationInfo?.pedestalInfo?.name,
+                                    ParamType.String,
+                                  ),
                                 }.withoutNulls,
                               );
                             },
-                            text: 'Pedestal Settings',
+                            text: 'Medication Settings',
                             options: FFButtonOptions(
                               height: 40.0,
                               padding: EdgeInsetsDirectional.fromSTEB(
@@ -569,7 +732,7 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (_model.medInfo?.pedestalInfo == null)
+                        if (!_model.medInfo!.hasPedestalInfo())
                           FFButtonWidget(
                             onPressed: () async {
                               context.pushNamed(
@@ -609,42 +772,6 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FFButtonWidget(
-                          onPressed: () {
-                            print('Button pressed ...');
-                          },
-                          text: 'Delete Medication',
-                          options: FFButtonOptions(
-                            height: 40.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                24.0, 0.0, 24.0, 0.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 0.0),
-                            color: FlutterFlowTheme.of(context).error,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  color: Colors.white,
-                                ),
-                            elevation: 3.0,
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
                       ],
                     ),
                   ),

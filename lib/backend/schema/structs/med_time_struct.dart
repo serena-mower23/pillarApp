@@ -20,6 +20,9 @@ class MedTimeStruct extends FFFirebaseStruct {
     DateTime? time,
     int? adherence,
     int? occurrences,
+    String? medName,
+    DateTime? creationDate,
+    bool? takenToday,
     FirestoreUtilData firestoreUtilData = const FirestoreUtilData(),
   })  : _monday = monday,
         _tuesday = tuesday,
@@ -31,6 +34,9 @@ class MedTimeStruct extends FFFirebaseStruct {
         _time = time,
         _adherence = adherence,
         _occurrences = occurrences,
+        _medName = medName,
+        _creationDate = creationDate,
+        _takenToday = takenToday,
         super(firestoreUtilData);
 
   // "monday" field.
@@ -95,6 +101,24 @@ class MedTimeStruct extends FFFirebaseStruct {
   void incrementOccurrences(int amount) => _occurrences = occurrences + amount;
   bool hasOccurrences() => _occurrences != null;
 
+  // "med_name" field.
+  String? _medName;
+  String get medName => _medName ?? '';
+  set medName(String? val) => _medName = val;
+  bool hasMedName() => _medName != null;
+
+  // "creation_date" field.
+  DateTime? _creationDate;
+  DateTime? get creationDate => _creationDate;
+  set creationDate(DateTime? val) => _creationDate = val;
+  bool hasCreationDate() => _creationDate != null;
+
+  // "takenToday" field.
+  bool? _takenToday;
+  bool get takenToday => _takenToday ?? false;
+  set takenToday(bool? val) => _takenToday = val;
+  bool hasTakenToday() => _takenToday != null;
+
   static MedTimeStruct fromMap(Map<String, dynamic> data) => MedTimeStruct(
         monday: data['monday'] as bool?,
         tuesday: data['tuesday'] as bool?,
@@ -106,6 +130,9 @@ class MedTimeStruct extends FFFirebaseStruct {
         time: data['time'] as DateTime?,
         adherence: castToType<int>(data['adherence']),
         occurrences: castToType<int>(data['occurrences']),
+        medName: data['med_name'] as String?,
+        creationDate: data['creation_date'] as DateTime?,
+        takenToday: data['takenToday'] as bool?,
       );
 
   static MedTimeStruct? maybeFromMap(dynamic data) =>
@@ -122,6 +149,9 @@ class MedTimeStruct extends FFFirebaseStruct {
         'time': _time,
         'adherence': _adherence,
         'occurrences': _occurrences,
+        'med_name': _medName,
+        'creation_date': _creationDate,
+        'takenToday': _takenToday,
       }.withoutNulls;
 
   @override
@@ -165,6 +195,18 @@ class MedTimeStruct extends FFFirebaseStruct {
         'occurrences': serializeParam(
           _occurrences,
           ParamType.int,
+        ),
+        'med_name': serializeParam(
+          _medName,
+          ParamType.String,
+        ),
+        'creation_date': serializeParam(
+          _creationDate,
+          ParamType.DateTime,
+        ),
+        'takenToday': serializeParam(
+          _takenToday,
+          ParamType.bool,
         ),
       }.withoutNulls;
 
@@ -220,6 +262,21 @@ class MedTimeStruct extends FFFirebaseStruct {
           ParamType.int,
           false,
         ),
+        medName: deserializeParam(
+          data['med_name'],
+          ParamType.String,
+          false,
+        ),
+        creationDate: deserializeParam(
+          data['creation_date'],
+          ParamType.DateTime,
+          false,
+        ),
+        takenToday: deserializeParam(
+          data['takenToday'],
+          ParamType.bool,
+          false,
+        ),
       );
 
   @override
@@ -237,7 +294,10 @@ class MedTimeStruct extends FFFirebaseStruct {
         sunday == other.sunday &&
         time == other.time &&
         adherence == other.adherence &&
-        occurrences == other.occurrences;
+        occurrences == other.occurrences &&
+        medName == other.medName &&
+        creationDate == other.creationDate &&
+        takenToday == other.takenToday;
   }
 
   @override
@@ -251,7 +311,10 @@ class MedTimeStruct extends FFFirebaseStruct {
         sunday,
         time,
         adherence,
-        occurrences
+        occurrences,
+        medName,
+        creationDate,
+        takenToday
       ]);
 }
 
@@ -266,6 +329,9 @@ MedTimeStruct createMedTimeStruct({
   DateTime? time,
   int? adherence,
   int? occurrences,
+  String? medName,
+  DateTime? creationDate,
+  bool? takenToday,
   Map<String, dynamic> fieldValues = const {},
   bool clearUnsetFields = true,
   bool create = false,
@@ -282,6 +348,9 @@ MedTimeStruct createMedTimeStruct({
       time: time,
       adherence: adherence,
       occurrences: occurrences,
+      medName: medName,
+      creationDate: creationDate,
+      takenToday: takenToday,
       firestoreUtilData: FirestoreUtilData(
         clearUnsetFields: clearUnsetFields,
         create: create,

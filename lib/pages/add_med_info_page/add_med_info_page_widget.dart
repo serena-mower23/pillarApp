@@ -109,7 +109,7 @@ class _AddMedInfoPageWidgetState extends State<AddMedInfoPageWidget> {
               children: [
                 Form(
                   key: _model.formKey,
-                  autovalidateMode: AutovalidateMode.disabled,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -389,34 +389,77 @@ class _AddMedInfoPageWidgetState extends State<AddMedInfoPageWidget> {
                         EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 0.0),
                     child: FFButtonWidget(
                       onPressed: () async {
-                        context.pushNamed(
-                          'AddMedTimesPage',
-                          queryParameters: {
-                            'medName': serializeParam(
-                              _model.medNameFieldController.text,
-                              ParamType.String,
-                            ),
-                            'medDosage': serializeParam(
-                              int.tryParse(
-                                  _model.dosageAmountFieldController.text),
-                              ParamType.int,
-                            ),
-                            'pillCount': serializeParam(
-                              int.tryParse(
-                                  _model.pillCountFieldController.text),
-                              ParamType.int,
-                            ),
-                            'withFood': serializeParam(
-                              _model.switchValue,
-                              ParamType.bool,
-                            ),
-                            'pillDosage': serializeParam(
-                              int.tryParse(
-                                  _model.pillDosageFieldController.text),
-                              ParamType.int,
-                            ),
-                          }.withoutNulls,
-                        );
+                        setState(() {
+                          _model.allFilled = valueOrDefault<bool>(
+                            (_model.medNameFieldController.text !=
+                                            null &&
+                                        _model
+                                                .medNameFieldController.text !=
+                                            '') &&
+                                    (_model.dosageAmountFieldController
+                                                .text !=
+                                            null &&
+                                        _model.dosageAmountFieldController
+                                                .text !=
+                                            '') &&
+                                    (_model.pillCountFieldController.text !=
+                                            null &&
+                                        _model.pillCountFieldController.text !=
+                                            '') &&
+                                    (_model.pillDosageFieldController.text !=
+                                            null &&
+                                        _model.pillDosageFieldController.text !=
+                                            '')
+                                ? true
+                                : false,
+                            false,
+                          );
+                        });
+                        if (_model.allFilled) {
+                          context.pushNamed(
+                            'AddMedTimesPage',
+                            queryParameters: {
+                              'medName': serializeParam(
+                                _model.medNameFieldController.text,
+                                ParamType.String,
+                              ),
+                              'medDosage': serializeParam(
+                                _model.dosageAmountFieldController.text,
+                                ParamType.String,
+                              ),
+                              'pillCount': serializeParam(
+                                _model.pillCountFieldController.text,
+                                ParamType.String,
+                              ),
+                              'withFood': serializeParam(
+                                _model.switchValue,
+                                ParamType.bool,
+                              ),
+                              'pillDosage': serializeParam(
+                                _model.pillDosageFieldController.text,
+                                ParamType.String,
+                              ),
+                            }.withoutNulls,
+                          );
+                        } else {
+                          await showDialog(
+                            context: context,
+                            builder: (alertDialogContext) {
+                              return AlertDialog(
+                                title: Text('Missing Information'),
+                                content: Text(
+                                    'Please finish filling out your medication information before continuing. '),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(alertDialogContext),
+                                    child: Text('Ok'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                       text: 'Next Step',
                       options: FFButtonOptions(

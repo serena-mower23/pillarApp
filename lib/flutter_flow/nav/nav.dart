@@ -82,18 +82,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? HomePageWidget() : LoginPageWidget(),
+          appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
           builder: (context, _) =>
-              appStateNotifier.loggedIn ? HomePageWidget() : LoginPageWidget(),
+              appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
         ),
         FFRoute(
-          name: 'HomePage',
-          path: '/homePage',
-          builder: (context, params) => HomePageWidget(
+          name: 'HomePageCopy',
+          path: '/homePageCopy',
+          builder: (context, params) => HomePageCopyWidget(
             isFetchingDevices:
                 params.getParam('isFetchingDevices', ParamType.bool),
             isBluetoothEnabled:
@@ -120,63 +120,149 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: 'AddMedInfoPage',
           path: '/addMedInfoPage',
-          builder: (context, params) => AddMedInfoPageWidget(),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: AddMedInfoPageWidget(),
+          ),
         ),
         FFRoute(
           name: 'SettingsPage',
           path: '/settingsPage',
-          builder: (context, params) => SettingsPageWidget(),
+          builder: (context, params) => params.isEmpty
+              ? NavBarPage(initialPage: 'SettingsPage')
+              : SettingsPageWidget(),
         ),
         FFRoute(
-          name: 'PedestalSettingsPage',
-          path: '/pedestalSettingsPage',
-          builder: (context, params) => PedestalSettingsPageWidget(
-            medName: params.getParam('medName', ParamType.String),
+          name: 'MedicationSettingsPage',
+          path: '/medicationSettingsPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: MedicationSettingsPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+            ),
           ),
         ),
         FFRoute(
           name: 'AddMedTimesPage',
           path: '/addMedTimesPage',
-          builder: (context, params) => AddMedTimesPageWidget(
-            medName: params.getParam('medName', ParamType.String),
-            medDosage: params.getParam('medDosage', ParamType.int),
-            pillCount: params.getParam('pillCount', ParamType.int),
-            withFood: params.getParam('withFood', ParamType.bool),
-            pillDosage: params.getParam('pillDosage', ParamType.int),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: AddMedTimesPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              medDosage: params.getParam('medDosage', ParamType.String),
+              pillCount: params.getParam('pillCount', ParamType.String),
+              withFood: params.getParam('withFood', ParamType.bool),
+              pillDosage: params.getParam('pillDosage', ParamType.String),
+            ),
           ),
         ),
         FFRoute(
           name: 'ConnectPage',
           path: '/connectPage',
-          builder: (context, params) => ConnectPageWidget(
-            isBluetoothEnabled:
-                params.getParam('isBluetoothEnabled', ParamType.bool),
-            medName: params.getParam('medName', ParamType.String),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: ConnectPageWidget(
+              isBluetoothEnabled:
+                  params.getParam('isBluetoothEnabled', ParamType.bool),
+              medName: params.getParam('medName', ParamType.String),
+            ),
           ),
         ),
         FFRoute(
           name: 'SetUpPillPage',
           path: '/setUpPillPage',
-          builder: (context, params) => SetUpPillPageWidget(
-            pedestalName: params.getParam('pedestalName', ParamType.String),
-            pedestalID: params.getParam('pedestalID', ParamType.String),
-            medName: params.getParam('medName', ParamType.String),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: SetUpPillPageWidget(
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              medName: params.getParam('medName', ParamType.String),
+            ),
           ),
         ),
         FFRoute(
           name: 'SetUpBottlePage',
           path: '/setUpBottlePage',
-          builder: (context, params) => SetUpBottlePageWidget(
-            pedestalName: params.getParam('pedestalName', ParamType.String),
-            pedestalID: params.getParam('pedestalID', ParamType.String),
-            pillWeight: params.getParam('pillWeight', ParamType.String),
-            medName: params.getParam('medName', ParamType.String),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: SetUpBottlePageWidget(
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              pillWeight: params.getParam('pillWeight', ParamType.String),
+              medName: params.getParam('medName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'TakeMedPage',
+          path: '/takeMedPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: TakeMedPageWidget(
+              medicationName:
+                  params.getParam('medicationName', ParamType.String),
+              medicationTime:
+                  params.getParam('medicationTime', ParamType.DateTime),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+            ),
           ),
         ),
         FFRoute(
           name: 'EditMedInfoPage',
           path: '/editMedInfoPage',
-          builder: (context, params) => EditMedInfoPageWidget(),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: EditMedInfoPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              dosageAmount: params.getParam('dosageAmount', ParamType.String),
+              pillCount: params.getParam('pillCount', ParamType.String),
+              pillCountDosage:
+                  params.getParam('pillCountDosage', ParamType.String),
+              withFood: params.getParam('withFood', ParamType.bool),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'EditMedTimesPage',
+          path: '/editMedTimesPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: EditMedTimesPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              medDosage: params.getParam('medDosage', ParamType.int),
+              pillCount: params.getParam('pillCount', ParamType.int),
+              withFood: params.getParam('withFood', ParamType.bool),
+              pillDosage: params.getParam('pillDosage', ParamType.int),
+              oldMedName: params.getParam('oldMedName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'TarePage',
+          path: '/tarePage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: TarePageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'HomePage',
+          path: '/homePage',
+          builder: (context, params) => params.isEmpty
+              ? NavBarPage(initialPage: 'HomePage')
+              : HomePageWidget(
+                  isFetchingDevices:
+                      params.getParam('isFetchingDevices', ParamType.bool),
+                  isBluetoothEnabled:
+                      params.getParam('isBluetoothEnabled', ParamType.bool),
+                ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

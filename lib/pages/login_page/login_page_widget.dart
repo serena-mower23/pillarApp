@@ -35,8 +35,8 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
       _model.bluetoothEnabled = await actions.isBluetoothEnabled();
     });
 
-    _model.usernameFieldController ??= TextEditingController();
-    _model.usernameFieldFocusNode ??= FocusNode();
+    _model.emailFieldController ??= TextEditingController();
+    _model.emailFieldFocusNode ??= FocusNode();
 
     _model.passwordFieldController ??= TextEditingController();
     _model.passwordFieldFocusNode ??= FocusNode();
@@ -120,11 +120,12 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 16.0),
                               child: TextFormField(
-                                controller: _model.usernameFieldController,
-                                focusNode: _model.usernameFieldFocusNode,
+                                controller: _model.emailFieldController,
+                                focusNode: _model.emailFieldFocusNode,
+                                textInputAction: TextInputAction.next,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Username',
+                                  labelText: 'Email',
                                   hintStyle:
                                       FlutterFlowTheme.of(context).bodyLarge,
                                   enabledBorder: OutlineInputBorder(
@@ -158,8 +159,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                   ),
                                 ),
                                 style: FlutterFlowTheme.of(context).bodyLarge,
-                                validator: _model
-                                    .usernameFieldControllerValidator
+                                validator: _model.emailFieldControllerValidator
                                     .asValidator(context),
                               ),
                             ),
@@ -169,6 +169,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                               child: TextFormField(
                                 controller: _model.passwordFieldController,
                                 focusNode: _model.passwordFieldFocusNode,
+                                textInputAction: TextInputAction.next,
                                 obscureText: !_model.passwordFieldVisibility,
                                 decoration: InputDecoration(
                                   labelText: 'Password',
@@ -235,7 +236,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                   final user =
                                       await authManager.signInWithEmail(
                                     context,
-                                    _model.usernameFieldController.text,
+                                    _model.emailFieldController.text,
                                     _model.passwordFieldController.text,
                                   );
                                   if (user == null) {
@@ -243,7 +244,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                   }
 
                                   context.pushNamedAuth(
-                                    'HomePage',
+                                    'HomePageCopy',
                                     context.mounted,
                                     queryParameters: {
                                       'isBluetoothEnabled': serializeParam(
@@ -298,14 +299,57 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                       context.pushNamed('NewAccountPage');
                                     },
                                     child: Text(
-                                      'Sign Up Here',
+                                      'Sign up here.',
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
                                             fontFamily: 'Readex Pro',
-                                            color: Color(0xFF549DA8),
+                                            color: Color(0xFFF5ABCF),
                                           ),
                                     ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Text(
+                                  'Forgot your password? ',
+                                  style:
+                                      FlutterFlowTheme.of(context).bodyMedium,
+                                ),
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    if (_model
+                                        .emailFieldController.text.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Email required!',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    await authManager.resetPassword(
+                                      email: _model.emailFieldController.text,
+                                      context: context,
+                                    );
+                                  },
+                                  child: Text(
+                                    'Reset it here.',
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Color(0xFFF5ABCF),
+                                        ),
                                   ),
                                 ),
                               ],

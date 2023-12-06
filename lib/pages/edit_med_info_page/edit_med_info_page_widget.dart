@@ -1,10 +1,13 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/custom_code/actions/index.dart' as actions;
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +15,20 @@ import 'edit_med_info_page_model.dart';
 export 'edit_med_info_page_model.dart';
 
 class EditMedInfoPageWidget extends StatefulWidget {
-  const EditMedInfoPageWidget({Key? key}) : super(key: key);
+  const EditMedInfoPageWidget({
+    Key? key,
+    required this.medName,
+    required this.dosageAmount,
+    required this.pillCount,
+    required this.pillCountDosage,
+    required this.withFood,
+  }) : super(key: key);
+
+  final String? medName;
+  final String? dosageAmount;
+  final String? pillCount;
+  final String? pillCountDosage;
+  final bool? withFood;
 
   @override
   _EditMedInfoPageWidgetState createState() => _EditMedInfoPageWidgetState();
@@ -28,16 +44,36 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
     super.initState();
     _model = createModel(context, () => EditMedInfoPageModel());
 
-    _model.medNameFieldController ??= TextEditingController();
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      setState(() {
+        _model.meds = (currentUserDocument?.medications?.toList() ?? [])
+            .toList()
+            .cast<MedInfoStruct>();
+      });
+      _model.medInfo = await actions.getMedicationInfo(
+        _model.meds.toList(),
+        widget.medName!,
+      );
+      setState(() {
+        _model.medicationInfo = _model.medInfo;
+      });
+    });
+
+    _model.medNameFieldController ??=
+        TextEditingController(text: widget.medName);
     _model.medNameFieldFocusNode ??= FocusNode();
 
-    _model.dosageAmountFieldController ??= TextEditingController();
+    _model.dosageAmountFieldController ??=
+        TextEditingController(text: widget.dosageAmount);
     _model.dosageAmountFieldFocusNode ??= FocusNode();
 
-    _model.pillCountFieldController ??= TextEditingController();
+    _model.pillCountFieldController ??=
+        TextEditingController(text: widget.pillCount);
     _model.pillCountFieldFocusNode ??= FocusNode();
 
-    _model.pillDosageFieldController ??= TextEditingController();
+    _model.pillDosageFieldController ??=
+        TextEditingController(text: widget.pillCountDosage);
     _model.pillDosageFieldFocusNode ??= FocusNode();
   }
 
@@ -75,7 +111,7 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
-              context.pushNamed('HomePage');
+              context.pushNamed('HomePageCopy');
             },
             child: Icon(
               Icons.arrow_back_ios,
@@ -88,7 +124,7 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 50.0, 0.0),
               child: Text(
-                'Add Medication',
+                'Edit Medication',
                 style: FlutterFlowTheme.of(context).headlineMedium.override(
                       fontFamily: 'Outfit',
                       color: Colors.white,
@@ -109,7 +145,7 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
               children: [
                 Form(
                   key: _model.formKey,
-                  autovalidateMode: AutovalidateMode.disabled,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -117,7 +153,7 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
                         padding:
                             EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
                         child: Text(
-                          'Add Medication Info',
+                          'Edit Medication Info',
                           style: FlutterFlowTheme.of(context).titleLarge,
                         ),
                       ),
@@ -362,7 +398,7 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   8.0, 0.0, 0.0, 0.0),
                               child: Switch.adaptive(
-                                value: _model.switchValue ??= true,
+                                value: _model.switchValue ??= widget.withFood!,
                                 onChanged: (newValue) async {
                                   setState(
                                       () => _model.switchValue = newValue!);
@@ -390,7 +426,7 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
                     child: FFButtonWidget(
                       onPressed: () async {
                         context.pushNamed(
-                          'AddMedTimesPage',
+                          'EditMedTimesPage',
                           queryParameters: {
                             'medName': serializeParam(
                               _model.medNameFieldController.text,
@@ -414,6 +450,10 @@ class _EditMedInfoPageWidgetState extends State<EditMedInfoPageWidget> {
                               int.tryParse(
                                   _model.pillDosageFieldController.text),
                               ParamType.int,
+                            ),
+                            'oldMedName': serializeParam(
+                              widget.medName,
+                              ParamType.String,
                             ),
                           }.withoutNulls,
                         );

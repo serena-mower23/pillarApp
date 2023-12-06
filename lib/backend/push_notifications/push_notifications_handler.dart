@@ -112,7 +112,7 @@ class ParameterData {
 
 final parametersBuilderMap =
     <String, Future<ParameterData> Function(Map<String, dynamic>)>{
-  'HomePage': (data) async => ParameterData(
+  'HomePageCopy': (data) async => ParameterData(
         allParams: {
           'isFetchingDevices': getParameter<bool>(data, 'isFetchingDevices'),
           'isBluetoothEnabled': getParameter<bool>(data, 'isBluetoothEnabled'),
@@ -127,18 +127,20 @@ final parametersBuilderMap =
       ),
   'AddMedInfoPage': ParameterData.none(),
   'SettingsPage': ParameterData.none(),
-  'PedestalSettingsPage': (data) async => ParameterData(
+  'MedicationSettingsPage': (data) async => ParameterData(
         allParams: {
           'medName': getParameter<String>(data, 'medName'),
+          'pedestalID': getParameter<String>(data, 'pedestalID'),
+          'pedestalName': getParameter<String>(data, 'pedestalName'),
         },
       ),
   'AddMedTimesPage': (data) async => ParameterData(
         allParams: {
           'medName': getParameter<String>(data, 'medName'),
-          'medDosage': getParameter<int>(data, 'medDosage'),
-          'pillCount': getParameter<int>(data, 'pillCount'),
+          'medDosage': getParameter<String>(data, 'medDosage'),
+          'pillCount': getParameter<String>(data, 'pillCount'),
           'withFood': getParameter<bool>(data, 'withFood'),
-          'pillDosage': getParameter<int>(data, 'pillDosage'),
+          'pillDosage': getParameter<String>(data, 'pillDosage'),
         },
       ),
   'ConnectPage': (data) async => ParameterData(
@@ -162,7 +164,46 @@ final parametersBuilderMap =
           'medName': getParameter<String>(data, 'medName'),
         },
       ),
-  'EditMedInfoPage': ParameterData.none(),
+  'TakeMedPage': (data) async => ParameterData(
+        allParams: {
+          'medicationName': getParameter<String>(data, 'medicationName'),
+          'medicationTime': getParameter<DateTime>(data, 'medicationTime'),
+          'pedestalID': getParameter<String>(data, 'pedestalID'),
+          'pedestalName': getParameter<String>(data, 'pedestalName'),
+        },
+      ),
+  'EditMedInfoPage': (data) async => ParameterData(
+        allParams: {
+          'medName': getParameter<String>(data, 'medName'),
+          'dosageAmount': getParameter<String>(data, 'dosageAmount'),
+          'pillCount': getParameter<String>(data, 'pillCount'),
+          'pillCountDosage': getParameter<String>(data, 'pillCountDosage'),
+          'withFood': getParameter<bool>(data, 'withFood'),
+        },
+      ),
+  'EditMedTimesPage': (data) async => ParameterData(
+        allParams: {
+          'medName': getParameter<String>(data, 'medName'),
+          'medDosage': getParameter<int>(data, 'medDosage'),
+          'pillCount': getParameter<int>(data, 'pillCount'),
+          'withFood': getParameter<bool>(data, 'withFood'),
+          'pillDosage': getParameter<int>(data, 'pillDosage'),
+          'oldMedName': getParameter<String>(data, 'oldMedName'),
+        },
+      ),
+  'TarePage': (data) async => ParameterData(
+        allParams: {
+          'medName': getParameter<String>(data, 'medName'),
+          'pedestalName': getParameter<String>(data, 'pedestalName'),
+          'pedestalID': getParameter<String>(data, 'pedestalID'),
+        },
+      ),
+  'HomePage': (data) async => ParameterData(
+        allParams: {
+          'isFetchingDevices': getParameter<bool>(data, 'isFetchingDevices'),
+          'isBluetoothEnabled': getParameter<bool>(data, 'isBluetoothEnabled'),
+        },
+      ),
 };
 
 Map<String, dynamic> getInitialParameterData(Map<String, dynamic> data) {

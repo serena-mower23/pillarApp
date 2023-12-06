@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
+import '/custom_code/actions/index.dart' as actions;
 import 'add_med_times_page_widget.dart' show AddMedTimesPageWidget;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -50,15 +51,6 @@ class AddMedTimesPageModel extends FlutterFlowModel<AddMedTimesPageWidget> {
   void updateSelectedDeviceStruct(Function(BTDeviceStruct) updateFn) =>
       updateFn(selectedDevice ??= BTDeviceStruct());
 
-  List<DocumentReference> medTimes = [];
-  void addToMedTimes(DocumentReference item) => medTimes.add(item);
-  void removeFromMedTimes(DocumentReference item) => medTimes.remove(item);
-  void removeAtIndexFromMedTimes(int index) => medTimes.removeAt(index);
-  void insertAtIndexInMedTimes(int index, DocumentReference item) =>
-      medTimes.insert(index, item);
-  void updateMedTimesAtIndex(int index, Function(DocumentReference) updateFn) =>
-      medTimes[index] = updateFn(medTimes[index]);
-
   List<MedTimeStruct> medTimesList = [];
   void addToMedTimesList(MedTimeStruct item) => medTimesList.add(item);
   void removeFromMedTimesList(MedTimeStruct item) => medTimesList.remove(item);
@@ -86,6 +78,12 @@ class AddMedTimesPageModel extends FlutterFlowModel<AddMedTimesPageWidget> {
   void updateMedTimesInfoAtIndex(int index, Function(DateTime) updateFn) =>
       medTimesInfo[index] = updateFn(medTimesInfo[index]);
 
+  MedInfoStruct? medInfo;
+  void updateMedInfoStruct(Function(MedInfoStruct) updateFn) =>
+      updateFn(medInfo ??= MedInfoStruct());
+
+  bool selectEveryDay = true;
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
@@ -95,8 +93,6 @@ class AddMedTimesPageModel extends FlutterFlowModel<AddMedTimesPageWidget> {
   FormFieldController<String>? dropDownValueController;
   // State field(s) for Switch widget.
   bool? switchValue;
-  // Stores action output result for [Backend Call - Create Document] action in Button widget.
-  MedicationTimesRecord? newTime;
 
   /// Initialization and disposal methods.
 

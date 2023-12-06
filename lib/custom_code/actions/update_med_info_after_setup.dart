@@ -8,43 +8,29 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-Future<MedInfoStruct?> updateMedInfoAfterSetup(
-    String userID,
-    String medName,
-    BTDeviceStruct pedestalInfo,
-    String pillWeight,
-    String pillBottleWeight) async {
-  final db = FirebaseFirestore.instance;
+import 'index.dart'; // Imports other custom actions
 
-  final collection = db.collection('users');
-  final document = collection.doc(userID);
+import '/auth/firebase_auth/auth_util.dart';
 
-  MedInfoStruct? medInfo = null;
-  List<MedInfoStruct>? medList = null;
+List<MedInfoStruct>? updateMedInfoAfterSetup(
+  List<MedInfoStruct> medications,
+  String medicationName,
+  String newPillWeight,
+  String newPillBottleWeight,
+  BTDeviceStruct newPedestalInfo,
+) {
+  // Find the medication to update
+  MedInfoStruct? medicationToUpdate =
+      medications.firstWhere((med) => med.medicationName == medicationName);
 
-  document.get().then((docSnapshot) {
-    if (docSnapshot.exists) {
-      final listData = docSnapshot.data()?['medications'];
-      for (int i = 0; i < listData.length; i++) {
-        if (listData[i].contains(medName)) {
-          medInfo = listData[i];
-          document.update({
-            "medications": FieldValue.arrayRemove([i])
-          });
-        } else {
-          medList?.add(listData[i]);
-        }
-      }
-    }
-  });
+  // If the medication was found, update the fields
 
-  medInfo?.pedestalInfo = pedestalInfo;
-  medInfo?.pillWeight = pillWeight;
-  medInfo?.pillBottleWeight = pillBottleWeight;
+  medicationToUpdate.pillWeight = newPillWeight;
+  medicationToUpdate.pillBottleWeight = newPillBottleWeight;
+  medicationToUpdate.pedestalInfo = newPedestalInfo;
 
-  medList?.add(medInfo!);
-
-  document.update({"medications": medList});
-
-  return medInfo;
+  return medications;
 }
+
+// Set your action name, define your arguments and return parameter,
+// and then add the boilerplate code using the green button on the right!

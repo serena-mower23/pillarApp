@@ -86,15 +86,19 @@ class _SetUpPillPageWidgetState extends State<SetUpPillPageWidget> {
             highlightColor: Colors.transparent,
             onTap: () async {
               context.pushNamed(
-                'ConnectPage',
+                'TarePage',
                 queryParameters: {
                   'medName': serializeParam(
                     widget.medName,
                     ParamType.String,
                   ),
-                  'isBluetoothEnabled': serializeParam(
-                    false,
-                    ParamType.bool,
+                  'pedestalName': serializeParam(
+                    widget.pedestalName,
+                    ParamType.String,
+                  ),
+                  'pedestalID': serializeParam(
+                    widget.pedestalID,
+                    ParamType.String,
                   ),
                 }.withoutNulls,
               );

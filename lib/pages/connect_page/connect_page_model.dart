@@ -6,7 +6,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart' as actions;
 import 'connect_page_widget.dart' show ConnectPageWidget;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,8 +44,6 @@ class ConnectPageModel extends FlutterFlowModel<ConnectPageWidget> {
 
   bool deviceSelected = false;
 
-  DocumentReference? medID;
-
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
@@ -55,7 +52,7 @@ class ConnectPageModel extends FlutterFlowModel<ConnectPageWidget> {
   // Stores action output result for [Custom Action - findDevices] action in Icon widget.
   List<BTDeviceStruct>? devicesFound;
   // Stores action output result for [Custom Action - connectDevice] action in Button widget.
-  bool? hasWrite;
+  BTDeviceStruct? hasWrite;
 
   /// Initialization and disposal methods.
 

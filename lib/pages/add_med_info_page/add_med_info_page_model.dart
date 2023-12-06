@@ -54,6 +54,8 @@ class AddMedInfoPageModel extends FlutterFlowModel<AddMedInfoPageWidget> {
   void updateMedTimesAtIndex(int index, Function(MedTimeStruct) updateFn) =>
       medTimes[index] = updateFn(medTimes[index]);
 
+  bool allFilled = false;
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
@@ -62,24 +64,65 @@ class AddMedInfoPageModel extends FlutterFlowModel<AddMedInfoPageWidget> {
   FocusNode? medNameFieldFocusNode;
   TextEditingController? medNameFieldController;
   String? Function(BuildContext, String?)? medNameFieldControllerValidator;
+  String? _medNameFieldControllerValidator(BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Field is required';
+    }
+
+    return null;
+  }
+
   // State field(s) for DosageAmountField widget.
   FocusNode? dosageAmountFieldFocusNode;
   TextEditingController? dosageAmountFieldController;
   String? Function(BuildContext, String?)? dosageAmountFieldControllerValidator;
+  String? _dosageAmountFieldControllerValidator(
+      BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Field is required';
+    }
+
+    return null;
+  }
+
   // State field(s) for PillCountField widget.
   FocusNode? pillCountFieldFocusNode;
   TextEditingController? pillCountFieldController;
   String? Function(BuildContext, String?)? pillCountFieldControllerValidator;
+  String? _pillCountFieldControllerValidator(
+      BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Field is required';
+    }
+
+    return null;
+  }
+
   // State field(s) for PillDosageField widget.
   FocusNode? pillDosageFieldFocusNode;
   TextEditingController? pillDosageFieldController;
   String? Function(BuildContext, String?)? pillDosageFieldControllerValidator;
+  String? _pillDosageFieldControllerValidator(
+      BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Field is required';
+    }
+
+    return null;
+  }
+
   // State field(s) for Switch widget.
   bool? switchValue;
 
   /// Initialization and disposal methods.
 
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    medNameFieldControllerValidator = _medNameFieldControllerValidator;
+    dosageAmountFieldControllerValidator =
+        _dosageAmountFieldControllerValidator;
+    pillCountFieldControllerValidator = _pillCountFieldControllerValidator;
+    pillDosageFieldControllerValidator = _pillDosageFieldControllerValidator;
+  }
 
   void dispose() {
     unfocusNode.dispose();

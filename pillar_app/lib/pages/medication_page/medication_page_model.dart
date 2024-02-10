@@ -6,25 +6,20 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/permissions_util.dart';
+import 'medication_page_widget.dart' show MedicationPageWidget;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class MedicationPageModel extends FlutterFlowModel {
+class MedicationPageModel extends FlutterFlowModel<MedicationPageWidget> {
   ///  Local state fields for this page.
 
-  bool isFetchingDevices = false;
+  bool isFetchingConnectedDevices = false;
 
   bool isBluetoothEnabled = false;
-
-  List<BTDeviceStruct> foundDevices = [];
-  void addToFoundDevices(BTDeviceStruct item) => foundDevices.add(item);
-  void removeFromFoundDevices(BTDeviceStruct item) => foundDevices.remove(item);
-  void removeAtIndexFromFoundDevices(int index) => foundDevices.removeAt(index);
-  void updateFoundDevicesAtIndex(
-          int index, Function(BTDeviceStruct) updateFn) =>
-      foundDevices[index] = updateFn(foundDevices[index]);
 
   List<BTDeviceStruct> connectedDevices = [];
   void addToConnectedDevices(BTDeviceStruct item) => connectedDevices.add(item);
@@ -32,29 +27,49 @@ class MedicationPageModel extends FlutterFlowModel {
       connectedDevices.remove(item);
   void removeAtIndexFromConnectedDevices(int index) =>
       connectedDevices.removeAt(index);
+  void insertAtIndexInConnectedDevices(int index, BTDeviceStruct item) =>
+      connectedDevices.insert(index, item);
   void updateConnectedDevicesAtIndex(
           int index, Function(BTDeviceStruct) updateFn) =>
       connectedDevices[index] = updateFn(connectedDevices[index]);
 
-  bool isFetchingConnectedDevices = false;
+  MedInfoStruct? medicationInfo;
+  void updateMedicationInfoStruct(Function(MedInfoStruct) updateFn) =>
+      updateFn(medicationInfo ??= MedInfoStruct());
 
-  bool deviceSelected = false;
+  List<MedInfoStruct> meds = [];
+  void addToMeds(MedInfoStruct item) => meds.add(item);
+  void removeFromMeds(MedInfoStruct item) => meds.remove(item);
+  void removeAtIndexFromMeds(int index) => meds.removeAt(index);
+  void insertAtIndexInMeds(int index, MedInfoStruct item) =>
+      meds.insert(index, item);
+  void updateMedsAtIndex(int index, Function(MedInfoStruct) updateFn) =>
+      meds[index] = updateFn(meds[index]);
+
+  List<MedTimeStruct> medTimes = [];
+  void addToMedTimes(MedTimeStruct item) => medTimes.add(item);
+  void removeFromMedTimes(MedTimeStruct item) => medTimes.remove(item);
+  void removeAtIndexFromMedTimes(int index) => medTimes.removeAt(index);
+  void insertAtIndexInMedTimes(int index, MedTimeStruct item) =>
+      medTimes.insert(index, item);
+  void updateMedTimesAtIndex(int index, Function(MedTimeStruct) updateFn) =>
+      medTimes[index] = updateFn(medTimes[index]);
+
+  String? adherence;
 
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
+  // Stores action output result for [Custom Action - updateOccurrences] action in MedicationPage widget.
+  List<MedInfoStruct>? occurrencesUpdate;
   // Stores action output result for [Custom Action - getMedicationInfo] action in MedicationPage widget.
-  MedicationStruct? medicationInfo;
-  // Stores action output result for [Custom Action - isBluetoothEnabled] action in MedicationPage widget.
-  bool? bluetoothEnabled;
-  // Stores action output result for [Custom Action - getConnectedDevices] action in Column widget.
-  List<BTDeviceStruct>? fetchedConnectedDevices;
-  // Stores action output result for [Custom Action - findDevices] action in Column widget.
-  List<BTDeviceStruct>? devices;
-  // Stores action output result for [Custom Action - findDevices] action in Button widget.
-  List<BTDeviceStruct>? devicesFound;
-  // Stores action output result for [Custom Action - connectDevice] action in ListTile widget.
-  bool? hasWrite;
+  MedInfoStruct? medInfo;
+  // Stores action output result for [Custom Action - totalAdherence] action in MedicationPage widget.
+  double? totalAdherence;
+  // Stores action output result for [Custom Action - connectDevice] action in MedicationPage widget.
+  BTDeviceStruct? connectedDevice;
+  // Stores action output result for [Custom Action - deleteMedication] action in Button widget.
+  List<MedInfoStruct>? updatedMeds;
 
   /// Initialization and disposal methods.
 

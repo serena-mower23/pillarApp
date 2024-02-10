@@ -1,47 +1,41 @@
 import '/backend/schema/structs/index.dart';
-import '/components/received_data_display_widget.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/instant_timer.dart';
+import 'dart:async';
 import '/custom_code/actions/index.dart' as actions;
+import 'set_up_pill_page_widget.dart' show SetUpPillPageWidget;
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class PedestalPageModel extends FlutterFlowModel {
+class SetUpPillPageModel extends FlutterFlowModel<SetUpPillPageWidget> {
   ///  Local state fields for this page.
 
-  String deviceName = '';
-
-  String deviceId = '';
-
-  int? deviceRssi;
-
-  int? currentRssi;
-
   String receivedValue = '';
+
+  String pillWeight = '';
 
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // State field(s) for TextField widget.
-  TextEditingController? textController;
-  String? Function(BuildContext, String?)? textControllerValidator;
-  // Model for DisplayReceivedData.
-  late ReceivedDataDisplayModel displayReceivedDataModel;
+  // Stores action output result for [Custom Action - connectDevice] action in SetUpPillPage widget.
+  BTDeviceStruct? connectedDevice;
+  InstantTimer? onePillTimer;
+  // Stores action output result for [Custom Action - receiveData] action in Button widget.
+  String? pillValue;
 
   /// Initialization and disposal methods.
 
-  void initState(BuildContext context) {
-    displayReceivedDataModel =
-        createModel(context, () => ReceivedDataDisplayModel());
-  }
+  void initState(BuildContext context) {}
 
   void dispose() {
     unfocusNode.dispose();
-    textController?.dispose();
-    displayReceivedDataModel.dispose();
+    onePillTimer?.cancel();
   }
 
   /// Action blocks are added here.

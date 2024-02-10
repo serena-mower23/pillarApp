@@ -8,10 +8,8 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+Future<List<TakenDateStruct>> emptyTakenDateList() async {
+  // Add your function code here!
 
-Future<int> getRssi(BTDeviceStruct deviceInfo) async {
-  final device =
-      BluetoothDevice.fromId(deviceInfo.id, localName: deviceInfo.name);
-  return await device.readRssi();
+  return List<TakenDateStruct>.empty();
 }

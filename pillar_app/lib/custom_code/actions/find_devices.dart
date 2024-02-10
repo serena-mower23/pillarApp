@@ -25,7 +25,6 @@ Future<List<BTDeviceStruct>> findDevices() async {
       devices.add(BTDeviceStruct(
         name: deviceResult.device.localName,
         id: deviceResult.device.remoteId.toString(),
-        rssi: deviceResult.rssi,
       ));
     });
   });

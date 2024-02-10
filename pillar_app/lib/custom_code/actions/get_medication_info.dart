@@ -8,27 +8,19 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-Future<MedicationStruct?> getMedicationInfo(
-  String medicationName,
-  String docID,
+Future<MedInfoStruct?> getMedicationInfo(
+  List<MedInfoStruct> medList,
+  String medName,
 ) async {
-  final db = FirebaseFirestore.instance;
+  // Add your function code here!
 
-  final collection = db.collection('user');
-  final document = collection.doc(docID);
-
-  MedicationStruct? medInfo = null;
-
-  document.get().then((docSnapshot) {
-    if (docSnapshot.exists) {
-      final listData = docSnapshot.data()?['medications'];
-      for (String listItem in listData) {
-        if (listItem.contains(medicationName)) {
-          medInfo = listItem as MedicationStruct;
-          break;
-        }
-      }
+  MedInfoStruct? medInfo;
+  for (int i = 0; i < medList.length; i++) {
+    if (medList[i].medicationName == medName) {
+      medInfo = medList[i];
+      break;
     }
-  });
+  }
+
   return medInfo;
 }

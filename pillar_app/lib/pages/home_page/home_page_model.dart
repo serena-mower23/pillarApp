@@ -1,67 +1,38 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/components/empty_medication_list_widget.dart';
+import '/components/med_item_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart' as actions;
-import '/flutter_flow/permissions_util.dart';
+import 'home_page_widget.dart' show HomePageWidget;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class HomePageModel extends FlutterFlowModel {
-  ///  Local state fields for this page.
-
-  bool? isFetchingDevices;
-
-  bool isBluetoothEnabled = false;
-
-  List<BTDeviceStruct> foundDevices = [];
-  void addToFoundDevices(BTDeviceStruct item) => foundDevices.add(item);
-  void removeFromFoundDevices(BTDeviceStruct item) => foundDevices.remove(item);
-  void removeAtIndexFromFoundDevices(int index) => foundDevices.removeAt(index);
-  void updateFoundDevicesAtIndex(
-          int index, Function(BTDeviceStruct) updateFn) =>
-      foundDevices[index] = updateFn(foundDevices[index]);
-
-  List<BTDeviceStruct> connectedDevices = [];
-  void addToConnectedDevices(BTDeviceStruct item) => connectedDevices.add(item);
-  void removeFromConnectedDevices(BTDeviceStruct item) =>
-      connectedDevices.remove(item);
-  void removeAtIndexFromConnectedDevices(int index) =>
-      connectedDevices.removeAt(index);
-  void updateConnectedDevicesAtIndex(
-          int index, Function(BTDeviceStruct) updateFn) =>
-      connectedDevices[index] = updateFn(connectedDevices[index]);
-
-  bool isFetchingConnectedDevices = false;
-
-  bool deviceSelected = false;
-
+class HomePageModel extends FlutterFlowModel<HomePageWidget> {
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // Stores action output result for [Custom Action - getConnectedDevices] action in HomePage widget.
-  List<BTDeviceStruct>? fetchedConnectedDevice;
-  // Stores action output result for [Custom Action - findDevices] action in HomePage widget.
-  List<BTDeviceStruct>? availableDevices;
-  // Stores action output result for [Custom Action - getConnectedDevices] action in Column widget.
-  List<BTDeviceStruct>? fetchedConnectedDevices;
-  // Stores action output result for [Custom Action - findDevices] action in Column widget.
-  List<BTDeviceStruct>? devices;
-  // Stores action output result for [Custom Action - findDevices] action in Button widget.
-  List<BTDeviceStruct>? devicesFound;
-  // Stores action output result for [Custom Action - connectDevice] action in Button widget.
-  bool? hasWrite;
+  // Stores action output result for [Custom Action - resetTakenToday] action in HomePage widget.
+  List<MedInfoStruct>? meds;
+  // Models for MedItem dynamic component.
+  late FlutterFlowDynamicModels<MedItemModel> medItemModels;
 
   /// Initialization and disposal methods.
 
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    medItemModels = FlutterFlowDynamicModels(() => MedItemModel());
+  }
 
   void dispose() {
     unfocusNode.dispose();
+    medItemModels.dispose();
   }
 
   /// Action blocks are added here.

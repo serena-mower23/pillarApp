@@ -21,25 +21,10 @@ class UsersRecord extends FirestoreRecord {
   String get email => _email ?? '';
   bool hasEmail() => _email != null;
 
-  // "display_name" field.
-  String? _displayName;
-  String get displayName => _displayName ?? '';
-  bool hasDisplayName() => _displayName != null;
-
   // "created_time" field.
   DateTime? _createdTime;
   DateTime? get createdTime => _createdTime;
   bool hasCreatedTime() => _createdTime != null;
-
-  // "user_id" field.
-  String? _userId;
-  String get userId => _userId ?? '';
-  bool hasUserId() => _userId != null;
-
-  // "medications" field.
-  List<MedicationStruct>? _medications;
-  List<MedicationStruct> get medications => _medications ?? const [];
-  bool hasMedications() => _medications != null;
 
   // "password" field.
   String? _password;
@@ -61,19 +46,34 @@ class UsersRecord extends FirestoreRecord {
   String get phoneNumber => _phoneNumber ?? '';
   bool hasPhoneNumber() => _phoneNumber != null;
 
+  // "username" field.
+  String? _username;
+  String get username => _username ?? '';
+  bool hasUsername() => _username != null;
+
+  // "display_name" field.
+  String? _displayName;
+  String get displayName => _displayName ?? '';
+  bool hasDisplayName() => _displayName != null;
+
+  // "medications" field.
+  List<MedInfoStruct>? _medications;
+  List<MedInfoStruct> get medications => _medications ?? const [];
+  bool hasMedications() => _medications != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
-    _displayName = snapshotData['display_name'] as String?;
     _createdTime = snapshotData['created_time'] as DateTime?;
-    _userId = snapshotData['user_id'] as String?;
-    _medications = getStructList(
-      snapshotData['medications'],
-      MedicationStruct.fromMap,
-    );
     _password = snapshotData['password'] as String?;
     _uid = snapshotData['uid'] as String?;
     _photoUrl = snapshotData['photo_url'] as String?;
     _phoneNumber = snapshotData['phone_number'] as String?;
+    _username = snapshotData['username'] as String?;
+    _displayName = snapshotData['display_name'] as String?;
+    _medications = getStructList(
+      snapshotData['medications'],
+      MedInfoStruct.fromMap,
+    );
   }
 
   static CollectionReference get collection =>
@@ -111,24 +111,24 @@ class UsersRecord extends FirestoreRecord {
 
 Map<String, dynamic> createUsersRecordData({
   String? email,
-  String? displayName,
   DateTime? createdTime,
-  String? userId,
   String? password,
   String? uid,
   String? photoUrl,
   String? phoneNumber,
+  String? username,
+  String? displayName,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
       'email': email,
-      'display_name': displayName,
       'created_time': createdTime,
-      'user_id': userId,
       'password': password,
       'uid': uid,
       'photo_url': photoUrl,
       'phone_number': phoneNumber,
+      'username': username,
+      'display_name': displayName,
     }.withoutNulls,
   );
 
@@ -142,27 +142,27 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
   bool equals(UsersRecord? e1, UsersRecord? e2) {
     const listEquality = ListEquality();
     return e1?.email == e2?.email &&
-        e1?.displayName == e2?.displayName &&
         e1?.createdTime == e2?.createdTime &&
-        e1?.userId == e2?.userId &&
-        listEquality.equals(e1?.medications, e2?.medications) &&
         e1?.password == e2?.password &&
         e1?.uid == e2?.uid &&
         e1?.photoUrl == e2?.photoUrl &&
-        e1?.phoneNumber == e2?.phoneNumber;
+        e1?.phoneNumber == e2?.phoneNumber &&
+        e1?.username == e2?.username &&
+        e1?.displayName == e2?.displayName &&
+        listEquality.equals(e1?.medications, e2?.medications);
   }
 
   @override
   int hash(UsersRecord? e) => const ListEquality().hash([
         e?.email,
-        e?.displayName,
         e?.createdTime,
-        e?.userId,
-        e?.medications,
         e?.password,
         e?.uid,
         e?.photoUrl,
-        e?.phoneNumber
+        e?.phoneNumber,
+        e?.username,
+        e?.displayName,
+        e?.medications
       ]);
 
   @override

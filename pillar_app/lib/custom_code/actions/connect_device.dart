@@ -10,25 +10,13 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-Future<bool> connectDevice(BTDeviceStruct deviceInfo) async {
-  final device =
-      BluetoothDevice.fromId(deviceInfo.id, localName: deviceInfo.name);
+Future<BTDeviceStruct?> connectDevice(BTDeviceStruct deviceInfo) async {
+  final device = BluetoothDevice.fromId(deviceInfo.id);
   try {
     await device.connect();
+    return deviceInfo;
   } catch (e) {
-    print(e);
+    print('Failed to connect to device: $e');
+    return null;
   }
-  var hasWriteCharacteristic = false;
-  final services = await device.discoverServices();
-  for (BluetoothService service in services) {
-    for (BluetoothCharacteristic characteristic in service.characteristics) {
-      final isWrite = characteristic.properties.write;
-      if (isWrite) {
-        debugPrint(
-            'Found write characteristic: ${characteristic.uuid}, ${characteristic.properties}');
-        hasWriteCharacteristic = true;
-      }
-    }
-  }
-  return hasWriteCharacteristic;
 }

@@ -6,8 +6,10 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/permissions_util.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'medication_page_model.dart';
@@ -17,13 +19,9 @@ class MedicationPageWidget extends StatefulWidget {
   const MedicationPageWidget({
     Key? key,
     required this.medicationName,
-    required this.isBTEnabled,
-    required this.docID,
   }) : super(key: key);
 
   final String? medicationName;
-  final bool? isBTEnabled;
-  final String? docID;
 
   @override
   _MedicationPageWidgetState createState() => _MedicationPageWidgetState();
@@ -41,32 +39,51 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await requestPermission(bluetoothPermission);
-      _model.medicationInfo = await actions.getMedicationInfo(
-        widget.medicationName!,
-        widget.docID!,
-      );
-      _model.bluetoothEnabled = await actions.isBluetoothEnabled();
       setState(() {
-        _model.isBluetoothEnabled = widget.isBTEnabled!;
+        _model.meds = (currentUserDocument?.medications?.toList() ?? [])
+            .toList()
+            .cast<MedInfoStruct>();
       });
-      if (widget.isBTEnabled == true) {
-        setState(() {
-          _model.isFetchingDevices = true;
-          _model.isFetchingConnectedDevices = true;
-        });
-        await actions.getConnectedDevices();
-        setState(() {
-          _model.isFetchingConnectedDevices = false;
-          _model.connectedDevices =
-              _model.fetchedConnectedDevices!.toList().cast<BTDeviceStruct>();
-        });
-        await actions.findDevices();
-        setState(() {
-          _model.isFetchingDevices = false;
-          _model.foundDevices = _model.devices!.toList().cast<BTDeviceStruct>();
-        });
-      }
+      _model.occurrencesUpdate = await actions.updateOccurrences(
+        _model.meds.toList(),
+      );
+
+      await currentUserReference!.update({
+        ...mapToFirestore(
+          {
+            'medications': getMedInfoListFirestoreData(
+              _model.occurrencesUpdate,
+            ),
+          },
+        ),
+      });
+      _model.medInfo = await actions.getMedicationInfo(
+        _model.meds.toList(),
+        widget.medicationName!,
+      );
+      setState(() {
+        _model.medicationInfo = _model.medInfo;
+      });
+      setState(() {
+        _model.meds = (currentUserDocument?.medications?.toList() ?? [])
+            .toList()
+            .cast<MedInfoStruct>();
+      });
+      setState(() {
+        _model.medTimes =
+            _model.medInfo!.whenToTake.toList().cast<MedTimeStruct>();
+      });
+      _model.totalAdherence = await actions.totalAdherence(
+        _model.medicationInfo!,
+      );
+      setState(() {
+        _model.adherence = _model.totalAdherence == -1.0
+            ? 'No Adherence Available'
+            : '${_model.totalAdherence?.toString()} %';
+      });
+      _model.connectedDevice = await actions.connectDevice(
+        _model.medicationInfo!.pedestalInfo,
+      );
     });
   }
 
@@ -79,366 +96,671 @@ class _MedicationPageWidgetState extends State<MedicationPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<UsersRecord>>(
-      stream: queryUsersRecord(
-        queryBuilder: (usersRecord) =>
-            usersRecord.where('email', isEqualTo: currentUserEmail),
-        singleRecord: true,
-      ),
-      builder: (context, snapshot) {
-        // Customize what your widget looks like when it's loading.
-        if (!snapshot.hasData) {
-          return Scaffold(
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            body: Center(
-              child: SizedBox(
-                width: 50.0,
-                height: 50.0,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    FlutterFlowTheme.of(context).primary,
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        appBar: AppBar(
+          backgroundColor: Color(0xFF549DA8),
+          automaticallyImplyLeading: false,
+          leading: InkWell(
+            splashColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onTap: () async {
+              context.pushNamed('HomePage');
+            },
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: FlutterFlowTheme.of(context).primaryBackground,
+              size: 24.0,
+            ),
+          ),
+          title: Align(
+            alignment: AlignmentDirectional(0.0, -1.0),
+            child: Text(
+              'Medication',
+              style: FlutterFlowTheme.of(context).headlineMedium.override(
+                    fontFamily: 'Outfit',
+                    color: Colors.white,
+                    fontSize: 22.0,
                   ),
-                ),
-              ),
             ),
-          );
-        }
-        List<UsersRecord> medicationPageUsersRecordList = snapshot.data!;
-        // Return an empty Container when the item does not exist.
-        if (snapshot.data!.isEmpty) {
-          return Container();
-        }
-        final medicationPageUsersRecord =
-            medicationPageUsersRecordList.isNotEmpty
-                ? medicationPageUsersRecordList.first
-                : null;
-        return GestureDetector(
-          onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
-          child: Scaffold(
-            key: scaffoldKey,
-            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-            appBar: AppBar(
-              backgroundColor: Color(0xFF549DA8),
-              automaticallyImplyLeading: false,
-              title: Align(
-                alignment: AlignmentDirectional(0.00, -1.00),
-                child: Text(
-                  'Medication',
-                  style: FlutterFlowTheme.of(context).headlineMedium.override(
-                        fontFamily: 'Outfit',
-                        color: Colors.white,
-                        fontSize: 22.0,
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 16.0, 0.0),
+              child: InkWell(
+                splashColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: () async {
+                  context.pushNamed(
+                    'EditMedInfoPage',
+                    queryParameters: {
+                      'medName': serializeParam(
+                        widget.medicationName,
+                        ParamType.String,
                       ),
+                      'dosageAmount': serializeParam(
+                        _model.medicationInfo?.dosageAmount,
+                        ParamType.String,
+                      ),
+                      'pillCount': serializeParam(
+                        _model.medicationInfo?.pillCount,
+                        ParamType.String,
+                      ),
+                      'pillCountDosage': serializeParam(
+                        _model.medicationInfo?.pillCountDosage,
+                        ParamType.String,
+                      ),
+                      'withFood': serializeParam(
+                        _model.medicationInfo?.withFood,
+                        ParamType.bool,
+                      ),
+                    }.withoutNulls,
+                  );
+                },
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                  size: 24.0,
                 ),
               ),
-              actions: [],
-              centerTitle: false,
-              elevation: 2.0,
             ),
-            body: SafeArea(
-              top: true,
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
-                child: SingleChildScrollView(
-                  child: Column(
+          ],
+          centerTitle: true,
+          elevation: 2.0,
+        ),
+        body: SafeArea(
+          top: true,
+          child: Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              16.0, 0.0, 0.0, 0.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Text(
+                                valueOrDefault<String>(
+                                  widget.medicationName,
+                                  'medName',
+                                ),
+                                style: FlutterFlowTheme.of(context).titleLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Dosage Amount: ',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 18.0,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  4.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                valueOrDefault<String>(
+                                  '${_model.medInfo?.dosageAmount} mg',
+                                  'medDosage',
+                                ),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Total Pill Count: ',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 18.0,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  4.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                () {
+                                  if (_model.medicationInfo?.pillCount ==
+                                      '0.0') {
+                                    return 'Please Refill Medication';
+                                  } else if ((_model
+                                              .medicationInfo?.pillCount ==
+                                          '1') ||
+                                      (_model.medicationInfo?.pillCount ==
+                                          '1.0')) {
+                                    return '${_model.medInfo?.pillCount} pill';
+                                  } else {
+                                    return '${_model.medInfo?.pillCount} pills';
+                                  }
+                                }(),
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Pill Dosage:',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 18.0,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  4.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                (_model.medicationInfo?.pillCountDosage ==
+                                            '1') ||
+                                        (_model.medicationInfo
+                                                ?.pillCountDosage ==
+                                            '1.0')
+                                    ? '${_model.medicationInfo?.pillCountDosage} pill'
+                                    : 'pills',
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 0.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              'Pill Weight:',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 18.0,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  4.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                _model.medInfo!.hasPillWeight()
+                                    ? '${_model.medInfo?.pillWeight} mg'
+                                    : 'No Pill Weight Yet',
+                                style: FlutterFlowTheme.of(context).bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            'Pill Bottle Weight:',
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  fontFamily: 'Readex Pro',
+                                  fontSize: 18.0,
+                                ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                4.0, 0.0, 0.0, 0.0),
+                            child: Text(
+                              _model.medInfo!.hasPillBottleWeight()
+                                  ? '${_model.medInfo?.pillBottleWeight} mg'
+                                  : 'No Pill Bottle Weight Yet',
+                              style: FlutterFlowTheme.of(context).bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
                         padding:
                             EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text(
-                              valueOrDefault<String>(
-                                widget.medicationName,
-                                'medicationName',
-                              ),
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
-                          ],
+                        child: Text(
+                          _model.medInfo!.withFood
+                              ? 'Need to take with food'
+                              : 'Don\'t need to take with food',
+                          style: FlutterFlowTheme.of(context).bodyMedium,
                         ),
                       ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text(
-                              valueOrDefault<String>(
-                                _model.medicationInfo?.dosageAmount,
-                                'dosageAmount',
-                              ),
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text(
-                              valueOrDefault<String>(
-                                _model.medicationInfo?.pillCount,
-                                'pillCount',
-                              ),
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text(
-                              valueOrDefault<String>(
-                                _model.medicationInfo?.pillDosageCount,
-                                'pillDosage',
-                              ),
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text(
-                              valueOrDefault<String>(
-                                _model.medicationInfo?.withFood?.toString(),
-                                'withFood',
-                              ),
-                              style: FlutterFlowTheme.of(context).bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Padding(
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Align(
+                          alignment: AlignmentDirectional(0.0, -1.0),
+                          child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 30.0, 0.0, 0.0),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                setState(() {
-                                  _model.isFetchingDevices = true;
-                                  _model.isFetchingConnectedDevices = true;
-                                });
-                                _model.fetchedConnectedDevices =
-                                    await actions.getConnectedDevices();
-                                setState(() {
-                                  _model.isFetchingConnectedDevices = false;
-                                  _model.connectedDevices = _model
-                                      .fetchedConnectedDevices!
-                                      .toList()
-                                      .cast<BTDeviceStruct>();
-                                });
-                                _model.devices = await actions.findDevices();
-                                setState(() {
-                                  _model.isFetchingDevices = false;
-                                  _model.foundDevices = _model.devices!
-                                      .toList()
-                                      .cast<BTDeviceStruct>();
-                                });
-
-                                setState(() {});
-                              },
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Align(
-                                    alignment:
-                                        AlignmentDirectional(0.00, -1.00),
-                                    child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 8.0, 0.0, 0.0),
-                                      child: FFButtonWidget(
-                                        onPressed: () async {
-                                          _model.devicesFound =
-                                              await actions.findDevices();
-
-                                          setState(() {});
-                                        },
-                                        text: 'Find Available Pedestal',
-                                        options: FFButtonOptions(
-                                          height: 40.0,
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  12.0, 0.0, 12.0, 0.0),
-                                          iconPadding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 0.0, 0.0, 0.0),
-                                          color: Color(0xFFF5ABCF),
-                                          textStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleSmall
-                                                  .override(
-                                                    fontFamily: 'Readex Pro',
-                                                    color: Colors.white,
-                                                  ),
-                                          elevation: 3.0,
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                            width: 1.0,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
+                                0.0, 24.0, 0.0, 8.0),
+                            child: Text(
+                              'Medication Schedule',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 20.0,
+                                  ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(
+                        child: Builder(
+                          builder: (context) {
+                            final times =
+                                _model.medInfo?.whenToTake?.toList() ?? [];
+                            return ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: times.length,
+                              itemBuilder: (context, timesIndex) {
+                                final timesItem = times[timesIndex];
+                                return Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      16.0, 8.0, 16.0, 8.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Text(
+                                              valueOrDefault<String>(
+                                                dateTimeFormat(
+                                                    'jm', timesItem.time),
+                                                'No Time Recorded',
+                                              ),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 16.0, 0.0, 0.0),
-                                    child: Text(
-                                      'Available Pedestals:',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            fontFamily: 'Readex Pro',
-                                            fontSize: 16.0,
-                                          ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 391.0,
-                                    decoration: BoxDecoration(),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 20.0, 0.0, 0.0),
-                                          child: Builder(
-                                            builder: (context) {
-                                              final displayAvailableDevices =
-                                                  _model.devicesFound!.toList();
-                                              return ListView.builder(
-                                                padding: EdgeInsets.zero,
-                                                shrinkWrap: true,
-                                                scrollDirection: Axis.vertical,
-                                                itemCount:
-                                                    displayAvailableDevices
-                                                        .length,
-                                                itemBuilder: (context,
-                                                    displayAvailableDevicesIndex) {
-                                                  final displayAvailableDevicesItem =
-                                                      displayAvailableDevices[
-                                                          displayAvailableDevicesIndex];
-                                                  return InkWell(
-                                                    splashColor:
-                                                        Colors.transparent,
-                                                    focusColor:
-                                                        Colors.transparent,
-                                                    hoverColor:
-                                                        Colors.transparent,
-                                                    highlightColor:
-                                                        Colors.transparent,
-                                                    onTap: () async {
-                                                      _model.hasWrite =
-                                                          await actions
-                                                              .connectDevice(
-                                                        displayAvailableDevicesItem,
-                                                      );
-                                                      setState(() {
-                                                        _model.addToConnectedDevices(
-                                                            displayAvailableDevicesItem);
-                                                      });
-
-                                                      context.pushNamed(
-                                                        'PedestalPage',
-                                                        queryParameters: {
-                                                          'deviceName':
-                                                              serializeParam(
-                                                            displayAvailableDevicesItem
-                                                                .name,
-                                                            ParamType.String,
-                                                          ),
-                                                          'deviceId':
-                                                              serializeParam(
-                                                            displayAvailableDevicesItem
-                                                                .id,
-                                                            ParamType.String,
-                                                          ),
-                                                          'deviceRssi':
-                                                              serializeParam(
-                                                            displayAvailableDevicesItem
-                                                                .rssi,
-                                                            ParamType.int,
-                                                          ),
-                                                        }.withoutNulls,
-                                                      );
-
-                                                      setState(() {});
-                                                    },
-                                                    child: ListTile(
-                                                      title: Text(
-                                                        displayAvailableDevicesItem
-                                                            .name,
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleLarge,
-                                                      ),
-                                                      subtitle: Text(
-                                                        displayAvailableDevicesItem
-                                                            .id,
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .labelMedium,
-                                                      ),
-                                                      trailing: Icon(
-                                                        Icons.arrow_forward_ios,
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        size: 20.0,
-                                                      ),
-                                                      tileColor:
-                                                          Color(0xFFF1F4F8),
-                                                      dense: false,
-                                                    ),
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Text(
+                                              timesItem.sunday &&
+                                                      timesItem.monday &&
+                                                      timesItem.tuesday &&
+                                                      timesItem.wednesday &&
+                                                      timesItem.thursday &&
+                                                      timesItem.friday &&
+                                                      timesItem.saturday
+                                                  ? 'Everyday'
+                                                  : '${timesItem.sunday ? 'Sun ' : ''}${timesItem.monday ? 'Mon ' : ''}${timesItem.tuesday ? 'Tue ' : ''}${timesItem.wednesday ? 'Wed ' : ''}${timesItem.thursday ? 'Thu ' : ''}${timesItem.friday ? 'Fri ' : ''}${timesItem.saturday ? 'Sat' : ''}',
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Adherence',
+                          style:
+                              FlutterFlowTheme.of(context).bodyLarge.override(
+                                    fontFamily: 'Readex Pro',
+                                    fontSize: 20.0,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          valueOrDefault<String>(
+                            _model.adherence,
+                            'No Adherence Available',
+                          ),
+                          textAlign: TextAlign.center,
+                          style: FlutterFlowTheme.of(context).bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional(0.0, -1.0),
+                          child: Text(
+                            'Pedestal ',
+                            style:
+                                FlutterFlowTheme.of(context).bodyLarge.override(
+                                      fontFamily: 'Readex Pro',
+                                      fontSize: 20.0,
+                                    ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              _model.medInfo!.hasPedestalInfo()
+                                  ? 'Pedestal ID: ${_model.medInfo?.pedestalInfo?.id}'
+                                  : 'No Registered Pedestal',
+                              style: FlutterFlowTheme.of(context).bodyMedium,
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 8.0, 16.0, 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 16.0, 0.0),
+                          child: FFButtonWidget(
+                            onPressed: () async {
+                              await actions.cancelAllNotifications();
+                              _model.updatedMeds =
+                                  await actions.deleteMedication(
+                                (currentUserDocument?.medications?.toList() ??
+                                        [])
+                                    .toList(),
+                                widget.medicationName!,
+                              );
+
+                              await currentUserReference!.update({
+                                ...mapToFirestore(
+                                  {
+                                    'medications': getMedInfoListFirestoreData(
+                                      _model.updatedMeds,
+                                    ),
+                                  },
+                                ),
+                              });
+                              await actions.resetNotifications(
+                                (currentUserDocument?.medications?.toList() ??
+                                        [])
+                                    .toList(),
+                                null,
+                              );
+
+                              context.pushNamed('HomePage');
+
+                              setState(() {});
+                            },
+                            text: 'Delete',
+                            options: FFButtonOptions(
+                              height: 40.0,
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  24.0, 0.0, 24.0, 0.0),
+                              iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 0.0, 0.0),
+                              color: FlutterFlowTheme.of(context).error,
+                              textStyle: FlutterFlowTheme.of(context)
+                                  .titleSmall
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    color: Colors.white,
+                                  ),
+                              elevation: 3.0,
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        if (!_model.medInfo!.hasPedestalInfo())
+                          FFButtonWidget(
+                            onPressed: () async {
+                              context.pushNamed(
+                                'ConnectPage',
+                                queryParameters: {
+                                  'isBluetoothEnabled': serializeParam(
+                                    await getPermissionStatus(
+                                        bluetoothPermission),
+                                    ParamType.bool,
+                                  ),
+                                  'medName': serializeParam(
+                                    widget.medicationName,
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,
+                              );
+                            },
+                            text: 'Register Pedestal',
+                            options: FFButtonOptions(
+                              height: 40.0,
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  24.0, 0.0, 24.0, 0.0),
+                              iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 0.0, 0.0),
+                              color: Color(0xFFF5ABCF),
+                              textStyle: FlutterFlowTheme.of(context)
+                                  .titleSmall
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    color: Colors.white,
+                                  ),
+                              elevation: 3.0,
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        if (_model.medInfo?.hasPedestalInfo() ?? true)
+                          FFButtonWidget(
+                            onPressed: () async {
+                              context.pushNamed(
+                                'MedicationSettingsPage',
+                                queryParameters: {
+                                  'medName': serializeParam(
+                                    widget.medicationName,
+                                    ParamType.String,
+                                  ),
+                                  'pedestalID': serializeParam(
+                                    _model.medicationInfo?.pedestalInfo?.id,
+                                    ParamType.String,
+                                  ),
+                                  'pedestalName': serializeParam(
+                                    _model.medicationInfo?.pedestalInfo?.name,
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,
+                              );
+                            },
+                            text: 'Medication Settings',
+                            options: FFButtonOptions(
+                              height: 40.0,
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  24.0, 0.0, 24.0, 0.0),
+                              iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 0.0, 0.0),
+                              color: Color(0xFFF5ABCF),
+                              textStyle: FlutterFlowTheme.of(context)
+                                  .titleSmall
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    color: Colors.white,
+                                  ),
+                              elevation: 3.0,
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

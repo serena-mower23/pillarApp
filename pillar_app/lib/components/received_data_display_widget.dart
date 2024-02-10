@@ -5,6 +5,7 @@ import '/flutter_flow/instant_timer.dart';
 import '/custom_code/actions/index.dart' as actions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'received_data_display_model.dart';
@@ -46,7 +47,7 @@ class _ReceivedDataDisplayWidgetState extends State<ReceivedDataDisplayWidget> {
             widget.device!,
           );
           setState(() {
-            _model.data = _model.receivedData;
+            _model.dataString = _model.receivedData;
           });
         },
         startImmediately: true,
@@ -74,7 +75,10 @@ class _ReceivedDataDisplayWidgetState extends State<ReceivedDataDisplayWidget> {
               ),
         ),
         Text(
-          _model.data!,
+          valueOrDefault<String>(
+            _model.receivedData,
+            'data',
+          ),
           style: FlutterFlowTheme.of(context).bodyMedium.override(
                 fontFamily: 'Readex Pro',
                 color: FlutterFlowTheme.of(context).primaryText,

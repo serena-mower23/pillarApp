@@ -1,16 +1,18 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/components/empty_medication_list_widget.dart';
+import '/components/med_item_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart' as actions;
-import '/flutter_flow/permissions_util.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
 import 'home_page_model.dart';
 export 'home_page_model.dart';
 
@@ -40,23 +42,21 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        _model.isBluetoothEnabled = widget.isBluetoothEnabled!;
-      });
-      setState(() {
-        _model.isFetchingDevices = true;
-        _model.isFetchingConnectedDevices = true;
-      });
-      _model.fetchedConnectedDevice = await actions.getConnectedDevices();
-      setState(() {
-        _model.isFetchingConnectedDevices = false;
-        _model.connectedDevices =
-            _model.fetchedConnectedDevices!.toList().cast<BTDeviceStruct>();
-      });
-      _model.availableDevices = await actions.findDevices();
-      setState(() {
-        _model.isFetchingDevices = false;
-        _model.foundDevices = _model.devices!.toList().cast<BTDeviceStruct>();
+      setDarkModeSetting(context, ThemeMode.light);
+      await actions.requestNotificationPermissions();
+      _model.meds = await actions.resetTakenToday(
+        (currentUserDocument?.medications?.toList() ?? []).toList(),
+        getCurrentTimestamp,
+      );
+
+      await currentUserReference!.update({
+        ...mapToFirestore(
+          {
+            'medications': getMedInfoListFirestoreData(
+              _model.meds,
+            ),
+          },
+        ),
       });
     });
   }
@@ -70,8 +70,19 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
+
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -79,19 +90,22 @@ class _HomePageWidgetState extends State<HomePageWidget> {
           backgroundColor: Color(0xFF549DA8),
           automaticallyImplyLeading: false,
           title: Align(
-            alignment: AlignmentDirectional(0.00, -1.00),
-            child: Text(
-              'Pillar',
-              style: FlutterFlowTheme.of(context).headlineMedium.override(
-                    fontFamily: 'Outfit',
-                    color: Colors.white,
-                    fontSize: 22,
-                  ),
+            alignment: AlignmentDirectional(0.0, -1.0),
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(36.0, 0.0, 0.0, 0.0),
+              child: Text(
+                'Pillar',
+                style: FlutterFlowTheme.of(context).headlineMedium.override(
+                      fontFamily: 'Outfit',
+                      color: Colors.white,
+                      fontSize: 22.0,
+                    ),
+              ),
             ),
           ),
           actions: [],
-          centerTitle: false,
-          elevation: 2,
+          centerTitle: true,
+          elevation: 2.0,
         ),
         body: SafeArea(
           top: true,
@@ -99,508 +113,112 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Align(
-                  alignment: AlignmentDirectional(0.00, -1.00),
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
-                    child: Text(
-                      'Current Medications',
-                      textAlign: TextAlign.center,
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'Readex Pro',
-                            fontSize: 30,
-                          ),
-                    ),
-                  ),
-                ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                  child: StreamBuilder<List<UsersRecord>>(
-                    stream: queryUsersRecord(
-                      queryBuilder: (usersRecord) => usersRecord.where('email',
-                          isEqualTo: currentUserEmail),
-                      singleRecord: true,
-                    ),
-                    builder: (context, snapshot) {
-                      // Customize what your widget looks like when it's loading.
-                      if (!snapshot.hasData) {
-                        return Center(
+                  padding: EdgeInsets.all(8.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional(0.0, -1.0),
                           child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 20, 0, 0),
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF549DA8),
-                                ),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 0.0, 0.0, 16.0),
+                            child: AuthUserStreamWidget(
+                              builder: (context) => Text(
+                                '${valueOrDefault(currentUserDocument?.username, '')}\'s Medications',
+                                textAlign: TextAlign.center,
+                                style: FlutterFlowTheme.of(context).titleLarge,
                               ),
                             ),
                           ),
-                        );
-                      }
-                      List<UsersRecord> medicationListUsersRecordList =
-                          snapshot.data!;
-                      // Return an empty Container when the item does not exist.
-                      if (snapshot.data!.isEmpty) {
-                        return Container();
-                      }
-                      final medicationListUsersRecord =
-                          medicationListUsersRecordList.isNotEmpty
-                              ? medicationListUsersRecordList.first
-                              : null;
-                      return Builder(
-                        builder: (context) {
-                          final medications = medicationListUsersRecord
-                                  ?.medications
-                                  ?.toList() ??
-                              [];
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: medications.length,
-                            itemBuilder: (context, medicationsIndex) {
-                              final medicationsItem =
-                                  medications[medicationsIndex];
-                              return Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
-                                child: Container(
-                                  width: 100,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF1F4F8),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Align(
-                                            alignment: AlignmentDirectional(
-                                                -1.00, 0.00),
-                                            child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(16, 12, 8, 0),
-                                              child: StreamBuilder<
-                                                  List<UsersRecord>>(
-                                                stream: queryUsersRecord(
-                                                  singleRecord: true,
-                                                ),
-                                                builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
-                                                  if (!snapshot.hasData) {
-                                                    return Center(
-                                                      child: SizedBox(
-                                                        width: 50,
-                                                        height: 50,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          valueColor:
-                                                              AlwaysStoppedAnimation<
-                                                                  Color>(
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                  List<UsersRecord>
-                                                      textUsersRecordList =
-                                                      snapshot.data!;
-                                                  // Return an empty Container when the item does not exist.
-                                                  if (snapshot.data!.isEmpty) {
-                                                    return Container();
-                                                  }
-                                                  final textUsersRecord =
-                                                      textUsersRecordList
-                                                              .isNotEmpty
-                                                          ? textUsersRecordList
-                                                              .first
-                                                          : null;
-                                                  return Text(
-                                                    medicationsItem
-                                                        .medicationName,
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          fontSize: 13,
-                                                        ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                        ),
+                        AuthUserStreamWidget(
+                          builder: (context) => Builder(
+                            builder: (context) {
+                              final medications =
+                                  (currentUserDocument?.medications?.toList() ??
+                                          [])
+                                      .toList();
+                              if (medications.isEmpty) {
+                                return EmptyMedicationListWidget();
+                              }
+                              return ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: medications.length,
+                                itemBuilder: (context, medicationsIndex) {
+                                  final medicationsItem =
+                                      medications[medicationsIndex];
+                                  return Container(
+                                    height: 200.0,
+                                    decoration: BoxDecoration(),
+                                    child: wrapWithModel(
+                                      model: _model.medItemModels.getModel(
+                                        medicationsItem.medicationName,
+                                        medicationsIndex,
                                       ),
-                                      Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Align(
-                                            alignment: AlignmentDirectional(
-                                                1.00, 0.00),
-                                            child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(0, 4, 16, 0),
-                                              child: FFButtonWidget(
-                                                onPressed: () async {
-                                                  context.pushNamed(
-                                                    'MedicationPage',
-                                                    queryParameters: {
-                                                      'isBTEnabled':
-                                                          serializeParam(
-                                                        await getPermissionStatus(
-                                                            bluetoothPermission),
-                                                        ParamType.bool,
-                                                      ),
-                                                      'medicationName':
-                                                          serializeParam(
-                                                        medicationsItem
-                                                            .medicationName,
-                                                        ParamType.String,
-                                                      ),
-                                                      'docID': serializeParam(
-                                                        medicationListUsersRecord
-                                                            ?.reference.id,
-                                                        ParamType.String,
-                                                      ),
-                                                    }.withoutNulls,
-                                                  );
-                                                },
-                                                text: 'View',
-                                                options: FFButtonOptions(
-                                                  height: 30,
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(8, 0, 8, 0),
-                                                  iconPadding:
-                                                      EdgeInsetsDirectional
-                                                          .fromSTEB(0, 0, 0, 0),
-                                                  color: Color(0xFFF5ABCF),
-                                                  textStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .titleSmall
-                                                          .override(
-                                                            fontFamily:
-                                                                'Readex Pro',
-                                                            color: Colors.white,
-                                                            fontSize: 12,
-                                                          ),
-                                                  elevation: 3,
-                                                  borderSide: BorderSide(
-                                                    color: Colors.transparent,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                      updateCallback: () => setState(() {}),
+                                      updateOnChange: true,
+                                      child: MedItemWidget(
+                                        key: Key(
+                                          'Keyxrx_${medicationsItem.medicationName}',
+                                        ),
+                                        medInfo: medicationsItem,
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: AlignmentDirectional(0.00, 1.00),
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 30),
-                    child: FFButtonWidget(
-                      onPressed: () async {
-                        context.pushNamed(
-                          'AddMedPage',
-                          extra: <String, dynamic>{
-                            kTransitionInfoKey: TransitionInfo(
-                              hasTransition: true,
-                              transitionType: PageTransitionType.fade,
-                              duration: Duration(milliseconds: 0),
-                            ),
-                          },
-                        );
-                      },
-                      text: 'Add New Medication',
-                      options: FFButtonOptions(
-                        height: 40,
-                        padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
-                        iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                        color: Color(0xFFF5ABCF),
-                        textStyle:
-                            FlutterFlowTheme.of(context).titleSmall.override(
-                                  fontFamily: 'Readex Pro',
-                                  color: Colors.white,
-                                ),
-                        elevation: 3,
-                        borderSide: BorderSide(
-                          color: Colors.transparent,
-                          width: 1,
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    InkWell(
-                      splashColor: Colors.transparent,
-                      focusColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      onTap: () async {
-                        setState(() {
-                          _model.isFetchingDevices = true;
-                          _model.isFetchingConnectedDevices = true;
-                        });
-                        _model.fetchedConnectedDevices =
-                            await actions.getConnectedDevices();
-                        setState(() {
-                          _model.isFetchingConnectedDevices = false;
-                          _model.connectedDevices = _model
-                              .fetchedConnectedDevices!
-                              .toList()
-                              .cast<BTDeviceStruct>();
-                        });
-                        _model.devices = await actions.findDevices();
-                        setState(() {
-                          _model.isFetchingDevices = false;
-                          _model.foundDevices =
-                              _model.devices!.toList().cast<BTDeviceStruct>();
-                        });
-
-                        setState(() {});
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional(0.00, -1.00),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-                              child: FFButtonWidget(
-                                onPressed: () async {
-                                  _model.devicesFound =
-                                      await actions.findDevices();
-
-                                  setState(() {});
-                                },
-                                text: 'Find Available Pedestal',
-                                options: FFButtonOptions(
-                                  height: 40,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      12, 0, 12, 0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  color: Color(0xFFF5ABCF),
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        color: Colors.white,
-                                      ),
-                                  elevation: 3,
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
+                        Align(
+                          alignment: AlignmentDirectional(0.0, 1.0),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 30.0, 0.0, 30.0),
+                            child: FFButtonWidget(
+                              onPressed: () async {
+                                context.pushNamed(
+                                  'AddMedInfoPage',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
+                              },
+                              text: 'Add New Medication',
+                              options: FFButtonOptions(
+                                height: 40.0,
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    24.0, 0.0, 24.0, 0.0),
+                                iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 0.0),
+                                color: Color(0xFFF5ABCF),
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleSmall
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      color: Colors.white,
+                                    ),
+                                elevation: 3.0,
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1.0,
                                 ),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
                           ),
-                          Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                            child: Text(
-                              'Available Pedestals:',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    fontSize: 16,
-                                  ),
-                            ),
-                          ),
-                          Container(
-                            width: 391,
-                            decoration: BoxDecoration(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 20, 0, 0),
-                                  child: Builder(
-                                    builder: (context) {
-                                      final displayAvailableDevices =
-                                          _model.devicesFound!.toList();
-                                      return ListView.builder(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        scrollDirection: Axis.vertical,
-                                        itemCount:
-                                            displayAvailableDevices.length,
-                                        itemBuilder: (context,
-                                            displayAvailableDevicesIndex) {
-                                          final displayAvailableDevicesItem =
-                                              displayAvailableDevices[
-                                                  displayAvailableDevicesIndex];
-                                          return Container(
-                                            width: 100,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(16, 16, 16, 0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      Align(
-                                                        alignment:
-                                                            AlignmentDirectional(
-                                                                -1.00, 0.00),
-                                                        child: Text(
-                                                          displayAvailableDevicesItem
-                                                              .name,
-                                                          textAlign:
-                                                              TextAlign.start,
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium,
-                                                        ),
-                                                      ),
-                                                      Align(
-                                                        alignment:
-                                                            AlignmentDirectional(
-                                                                -1.00, 0.00),
-                                                        child: Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(0,
-                                                                      16, 0, 0),
-                                                          child: Text(
-                                                            displayAvailableDevicesItem
-                                                                .id,
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                            style: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .bodyMedium,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                FFButtonWidget(
-                                                  onPressed: () async {
-                                                    _model.hasWrite =
-                                                        await actions
-                                                            .connectDevice(
-                                                      displayAvailableDevicesItem,
-                                                    );
-                                                    setState(() {
-                                                      _model.addToConnectedDevices(
-                                                          displayAvailableDevicesItem);
-                                                    });
-
-                                                    context.pushNamed(
-                                                      'PedestalPage',
-                                                      queryParameters: {
-                                                        'deviceName':
-                                                            serializeParam(
-                                                          displayAvailableDevicesItem
-                                                              .name,
-                                                          ParamType.String,
-                                                        ),
-                                                        'deviceId':
-                                                            serializeParam(
-                                                          displayAvailableDevicesItem
-                                                              .id,
-                                                          ParamType.String,
-                                                        ),
-                                                        'deviceRssi':
-                                                            serializeParam(
-                                                          displayAvailableDevicesItem
-                                                              .rssi,
-                                                          ParamType.int,
-                                                        ),
-                                                      }.withoutNulls,
-                                                    );
-
-                                                    setState(() {});
-                                                  },
-                                                  text: 'Button',
-                                                  options: FFButtonOptions(
-                                                    height: 40,
-                                                    padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                12, 0, 12, 0),
-                                                    iconPadding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(
-                                                                0, 0, 0, 0),
-                                                    color: Color(0xFFF5ABCF),
-                                                    textStyle: FlutterFlowTheme
-                                                            .of(context)
-                                                        .titleSmall
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          color: Colors.white,
-                                                        ),
-                                                    elevation: 3,
-                                                    borderSide: BorderSide(
-                                                      color: Colors.transparent,
-                                                      width: 1,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

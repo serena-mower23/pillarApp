@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-Future<void> turnOnBluetooth() async {
-  if (isAndroid) {
-    // return await FlutterBluePlus.instance.turnOn();
-  }
-  // return true;
+Future cancelAllNotifications() async {
+  // Add your function code here!\
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin.cancelAll();
 }

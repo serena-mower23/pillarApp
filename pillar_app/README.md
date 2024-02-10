@@ -1,7 +1,5 @@
-# PillarAppTest
+# PillarApp
 
-A new Flutter project.
+This is the Flutter application built using FlutterFlow for the Pillar MQP 23-24. 
 
-## Getting Started
 
-FlutterFlow projects are built to run on the Flutter _stable_ release.

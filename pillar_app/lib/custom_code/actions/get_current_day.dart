@@ -8,11 +8,8 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-
-Future<void> turnOffBluetooth() async {
-  if (isAndroid) {
-    // return await FlutterBluePlus();
-  }
-  // return true;
+Future<String> getCurrentDay() async {
+  final weekDays = FFAppConstants.daysOfTheWeek;
+  final now = DateTime.now();
+  return weekDays[now.weekday - 1];
 }

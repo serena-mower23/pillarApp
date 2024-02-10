@@ -3,15 +3,20 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/instant_timer.dart';
 import '/custom_code/actions/index.dart' as actions;
+import 'received_data_display_widget.dart' show ReceivedDataDisplayWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class ReceivedDataDisplayModel extends FlutterFlowModel {
+class ReceivedDataDisplayModel
+    extends FlutterFlowModel<ReceivedDataDisplayWidget> {
   ///  Local state fields for this component.
 
-  String? data;
+  String? dataString;
+
+  int? dataInt;
 
   ///  State fields for stateful widgets in this component.
 

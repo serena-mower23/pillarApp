@@ -5,8 +5,8 @@ import '../base_auth_user_provider.dart';
 
 export '../base_auth_user_provider.dart';
 
-class PillarAppTestFirebaseUser extends BaseAuthUser {
-  PillarAppTestFirebaseUser(this.user);
+class PillarAppFirebaseUser extends BaseAuthUser {
+  PillarAppFirebaseUser(this.user);
   User? user;
   bool get loggedIn => user != null;
 
@@ -23,7 +23,13 @@ class PillarAppTestFirebaseUser extends BaseAuthUser {
   Future? delete() => user?.delete();
 
   @override
-  Future? updateEmail(String email) async => await user?.updateEmail(email);
+  Future? updateEmail(String email) async {
+    try {
+      await user?.updateEmail(email);
+    } catch (_) {
+      await user?.verifyBeforeUpdateEmail(email);
+    }
+  }
 
   @override
   Future? sendEmailVerification() => user?.sendEmailVerification();
@@ -48,17 +54,17 @@ class PillarAppTestFirebaseUser extends BaseAuthUser {
   static BaseAuthUser fromUserCredential(UserCredential userCredential) =>
       fromFirebaseUser(userCredential.user);
   static BaseAuthUser fromFirebaseUser(User? user) =>
-      PillarAppTestFirebaseUser(user);
+      PillarAppFirebaseUser(user);
 }
 
-Stream<BaseAuthUser> pillarAppTestFirebaseUserStream() => FirebaseAuth.instance
+Stream<BaseAuthUser> pillarAppFirebaseUserStream() => FirebaseAuth.instance
         .authStateChanges()
         .debounce((user) => user == null && !loggedIn
             ? TimerStream(true, const Duration(seconds: 1))
             : Stream.value(user))
         .map<BaseAuthUser>(
       (user) {
-        currentUser = PillarAppTestFirebaseUser(user);
+        currentUser = PillarAppFirebaseUser(user);
         return currentUser!;
       },
     );

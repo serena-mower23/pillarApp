@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
+import 'dart:convert';
+
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 Future sendData(BTDeviceStruct deviceInfo, String data) async {
-  final device =
-      BluetoothDevice.fromId(deviceInfo.id, localName: deviceInfo.name);
+  final device = BluetoothDevice.fromId(deviceInfo.id);
   final services = await device.discoverServices();
   for (BluetoothService service in services) {
     for (BluetoothCharacteristic characteristic in service.characteristics) {

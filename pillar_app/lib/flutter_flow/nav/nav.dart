@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 
-import '../../auth/base_auth_user_provider.dart';
+import '/auth/base_auth_user_provider.dart';
 
+import '/backend/push_notifications/push_notifications_handler.dart'
+    show PushNotificationsHandler;
 import '/index.dart';
 import '/main.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -79,18 +82,13 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       debugLogDiagnostics: true,
       refreshListenable: appStateNotifier,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? HomePageWidget() : LoginPageWidget(),
+          appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
           builder: (context, _) =>
-              appStateNotifier.loggedIn ? HomePageWidget() : LoginPageWidget(),
-        ),
-        FFRoute(
-          name: 'HomePage',
-          path: '/homePage',
-          builder: (context, params) => HomePageWidget(),
+              appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
         ),
         FFRoute(
           name: 'LoginPage',
@@ -105,16 +103,176 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: 'MedicationPage',
           path: '/medicationPage',
-          builder: (context, params) => MedicationPageWidget(
-            medicationName: params.getParam('medicationName', ParamType.String),
-            isBTEnabled: params.getParam('isBTEnabled', ParamType.bool),
-            docID: params.getParam('docID', ParamType.String),
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: MedicationPageWidget(
+              medicationName:
+                  params.getParam('medicationName', ParamType.String),
+            ),
           ),
         ),
         FFRoute(
-          name: 'AddMedPage',
-          path: '/addMedPage',
-          builder: (context, params) => AddMedPageWidget(),
+          name: 'AddMedInfoPage',
+          path: '/addMedInfoPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: AddMedInfoPageWidget(),
+          ),
+        ),
+        FFRoute(
+          name: 'SettingsPage',
+          path: '/settingsPage',
+          builder: (context, params) => params.isEmpty
+              ? NavBarPage(initialPage: 'SettingsPage')
+              : SettingsPageWidget(),
+        ),
+        FFRoute(
+          name: 'MedicationSettingsPage',
+          path: '/medicationSettingsPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: MedicationSettingsPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'AddMedTimesPage',
+          path: '/addMedTimesPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: AddMedTimesPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              medDosage: params.getParam('medDosage', ParamType.String),
+              pillCount: params.getParam('pillCount', ParamType.String),
+              withFood: params.getParam('withFood', ParamType.bool),
+              pillDosage: params.getParam('pillDosage', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'ConnectPage',
+          path: '/connectPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: ConnectPageWidget(
+              isBluetoothEnabled:
+                  params.getParam('isBluetoothEnabled', ParamType.bool),
+              medName: params.getParam('medName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'SetUpPillPage',
+          path: '/setUpPillPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: SetUpPillPageWidget(
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              medName: params.getParam('medName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'SetUpBottlePage',
+          path: '/setUpBottlePage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: SetUpBottlePageWidget(
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              pillWeight: params.getParam('pillWeight', ParamType.String),
+              medName: params.getParam('medName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'TakeMedPage',
+          path: '/takeMedPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: TakeMedPageWidget(
+              medicationName:
+                  params.getParam('medicationName', ParamType.String),
+              medicationTime:
+                  params.getParam('medicationTime', ParamType.DateTime),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'EditMedInfoPage',
+          path: '/editMedInfoPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: EditMedInfoPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              dosageAmount: params.getParam('dosageAmount', ParamType.String),
+              pillCount: params.getParam('pillCount', ParamType.String),
+              pillCountDosage:
+                  params.getParam('pillCountDosage', ParamType.String),
+              withFood: params.getParam('withFood', ParamType.bool),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'EditMedTimesPage',
+          path: '/editMedTimesPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: EditMedTimesPageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              medDosage: params.getParam('medDosage', ParamType.int),
+              pillCount: params.getParam('pillCount', ParamType.int),
+              withFood: params.getParam('withFood', ParamType.bool),
+              pillDosage: params.getParam('pillDosage', ParamType.int),
+              oldMedName: params.getParam('oldMedName', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'TarePage',
+          path: '/tarePage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: TarePageWidget(
+              medName: params.getParam('medName', ParamType.String),
+              pedestalName: params.getParam('pedestalName', ParamType.String),
+              pedestalID: params.getParam('pedestalID', ParamType.String),
+            ),
+          ),
+        ),
+        FFRoute(
+          name: 'HomePage',
+          path: '/homePage',
+          builder: (context, params) => params.isEmpty
+              ? NavBarPage(initialPage: 'HomePage')
+              : HomePageWidget(
+                  isFetchingDevices:
+                      params.getParam('isFetchingDevices', ParamType.bool),
+                  isBluetoothEnabled:
+                      params.getParam('isBluetoothEnabled', ParamType.bool),
+                ),
+        ),
+        FFRoute(
+          name: 'UpdateEmailPage',
+          path: '/updateEmailPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: UpdateEmailPageWidget(),
+          ),
+        ),
+        FFRoute(
+          name: 'UpdatePasswordPage',
+          path: '/updatePasswordPage',
+          builder: (context, params) => NavBarPage(
+            initialPage: '',
+            page: UpdatePasswordPageWidget(),
+          ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -300,12 +458,12 @@ class FFRoute {
                     height: 50.0,
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        FlutterFlowTheme.of(context).primary,
+                        Color(0xFF549DA8),
                       ),
                     ),
                   ),
                 )
-              : page;
+              : PushNotificationsHandler(child: page);
 
           final transitionInfo = state.transitionInfo;
           return transitionInfo.hasTransition
@@ -313,13 +471,20 @@ class FFRoute {
                   key: state.pageKey,
                   child: child,
                   transitionDuration: transitionInfo.duration,
-                  transitionsBuilder: PageTransition(
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) =>
+                          PageTransition(
                     type: transitionInfo.transitionType,
                     duration: transitionInfo.duration,
                     reverseDuration: transitionInfo.duration,
                     alignment: transitionInfo.alignment,
                     child: child,
-                  ).transitionsBuilder,
+                  ).buildTransitions(
+                    context,
+                    animation,
+                    secondaryAnimation,
+                    child,
+                  ),
                 )
               : MaterialPage(key: state.pageKey, child: child);
         },
@@ -341,4 +506,24 @@ class TransitionInfo {
   final Alignment? alignment;
 
   static TransitionInfo appDefault() => TransitionInfo(hasTransition: false);
+}
+
+class RootPageContext {
+  const RootPageContext(this.isRootPage, [this.errorRoute]);
+  final bool isRootPage;
+  final String? errorRoute;
+
+  static bool isInactiveRootPage(BuildContext context) {
+    final rootPageContext = context.read<RootPageContext?>();
+    final isRootPage = rootPageContext?.isRootPage ?? false;
+    final location = GoRouter.of(context).location;
+    return isRootPage &&
+        location != '/' &&
+        location != rootPageContext?.errorRoute;
+  }
+
+  static Widget wrap(Widget child, {String? errorRoute}) => Provider.value(
+        value: RootPageContext(true, errorRoute),
+        child: child,
+      );
 }
